@@ -12,6 +12,10 @@ data class WaveModel(val waveType: WaveType) {
         }
         return array
     }
+
+    companion object {
+        val DEFAULT = WaveModel(WaveType.SINE)
+    }
 }
 
 enum class WaveType(val generator: (FloatArray, Int, Int) -> Unit) {

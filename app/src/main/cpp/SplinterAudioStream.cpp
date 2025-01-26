@@ -58,6 +58,7 @@ oboe::Result SplinterAudioStream::start() {
 }
 
 oboe::Result SplinterAudioStream::stop() {
+    mStream->flush();
     return mStream->requestStop();
 }
 

@@ -60,7 +60,7 @@ JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
         JNIEnv* env, jobject) {
     __android_log_print(ANDROID_LOG_INFO, TAG, "%s", __func__);
 
-    auto result = sPlayer.open();
+    auto result = sPlayer.close();
     return (jint) result;
 }
 

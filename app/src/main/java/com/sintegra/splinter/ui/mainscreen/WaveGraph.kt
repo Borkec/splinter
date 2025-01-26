@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun WaveGraph(
     points: List<Float>,
-    cursorPosition: Int,
     modifier: Modifier = Modifier
 ) {
     val resolution = points.size
