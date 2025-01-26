@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.sintegra.splinter.model.WaveModel
 import com.sintegra.splinter.model.WaveType
 import com.sintegra.splinter.ui.theme.SplinterTheme
-import com.sintegra.splinter.viewmodel.MainActivityViewModel
+import com.sintegra.splinter.ui.viewmodel.MainActivityViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

@@ -37,7 +37,7 @@ fun WavePicker(waveModel: WaveModel, onWavePicked: (WaveType) -> Unit, modifier:
         modifier = modifier
             .height(50.dp)
             .wrapContentWidth()
-            .background(Color.DarkGray)
+            .background(Color.Black)
             .border(2.dp, Color.LightGray, RoundedCornerShape(4.dp))
             .clickable { expanded = !expanded }
     ) {

@@ -20,7 +20,7 @@ fun WaveGraph(
 
     val xIndices = remember { List(resolution) { it.toFloat() / resolution.toFloat() } }
 
-    val cursorPositionNorm = cursorPosition.toFloat() / resolution.toFloat()
+//    val cursorPositionNorm = cursorPosition.toFloat() / resolution.toFloat()
 
     Canvas(
         modifier = modifier.height(50.dp)
@@ -40,11 +40,11 @@ fun WaveGraph(
             strokeWidth = 3f
         )
 
-        drawLine(
-            color = Color.Blue,
-            start = Offset(cursorPositionNorm * size.width, 0f),
-            end = Offset(cursorPositionNorm * size.width, size.height),
-            strokeWidth = 3f
-        )
+//        drawLine(
+//            color = Color.Blue,
+//            start = Offset(cursorPositionNorm * size.width, 0f),
+//            end = Offset(cursorPositionNorm * size.width, size.height),
+//            strokeWidth = 3f
+//        )
     }
 }

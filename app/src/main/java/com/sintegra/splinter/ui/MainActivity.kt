@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sintegra.splinter
+package com.sintegra.splinter.ui
 
 import android.content.Context
 import android.media.AudioManager

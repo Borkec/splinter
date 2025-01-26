@@ -6,7 +6,7 @@ import com.sintegra.splinter.data.repository.AudioRepositoryImpl
 import com.sintegra.splinter.data.service.AudioSource
 import com.sintegra.splinter.data.service.AudioSourceImpl
 import com.sintegra.splinter.data.service.NativeAudioBridge
-import com.sintegra.splinter.viewmodel.MainActivityViewModel
+import com.sintegra.splinter.ui.viewmodel.MainActivityViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModelOf

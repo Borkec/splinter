@@ -1,4 +1,4 @@
-package com.sintegra.splinter.viewmodel
+package com.sintegra.splinter.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
