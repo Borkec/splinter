@@ -29,7 +29,6 @@ class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() 
 
     fun onHold(x: Float, y: Float) {
         audioRepository.setSineFrequency(y)
-        audioRepository.setOffset(x)
     }
 
     fun onRelease() {

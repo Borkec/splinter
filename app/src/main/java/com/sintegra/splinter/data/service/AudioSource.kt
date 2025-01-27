@@ -17,8 +17,6 @@ interface AudioSource {
 
     fun setSineFrequency(frequency: Float)
 
-    fun setOffset(offset: Float)
-
     fun setAudioBuffer(buffer: FloatArray)
 
     fun getWaveTableSize(): Int
@@ -59,11 +57,7 @@ class AudioSourceImpl: AudioSource {
     }
 
     override fun setSineFrequency(frequency: Float) {
-        NativeAudioBridge.setSineFrequency(frequency)
-    }
-
-    override fun setOffset(offset: Float) {
-        NativeAudioBridge.setSecondOffset(offset)
+        NativeAudioBridge.setFrequency(frequency)
     }
 
     override fun setAudioBuffer(buffer: FloatArray) {

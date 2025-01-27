@@ -6,6 +6,7 @@ import com.sintegra.splinter.data.repository.AudioRepositoryImpl
 import com.sintegra.splinter.data.service.AudioSource
 import com.sintegra.splinter.data.service.AudioSourceImpl
 import com.sintegra.splinter.data.service.NativeAudioBridge
+import com.sintegra.splinter.model.WAVETABLE_SIZE
 import com.sintegra.splinter.ui.viewmodel.MainViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -36,6 +37,6 @@ class SplinterApplication: Application() {
             modules(splinterModule)
         }
 
-        NativeAudioBridge.initializeBridge()
+        NativeAudioBridge.initializeBridge(WAVETABLE_SIZE)
     }
 }

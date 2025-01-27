@@ -24,8 +24,6 @@ interface AudioRepository {
 
     fun setSineFrequency(frequency: Float)
 
-    fun setOffset(offset: Float)
-
     fun setWaveType(waveType: WaveType, customWave: List<Float>? = null)
 }
 
@@ -64,10 +62,6 @@ class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepositor
 
     override fun setSineFrequency(frequency: Float) {
         audioSource.setSineFrequency(frequency)
-    }
-
-    override fun setOffset(offset: Float) {
-        audioSource.setOffset(offset)
     }
 
     override fun setWaveType(waveType: WaveType, customWave: List<Float>?) {

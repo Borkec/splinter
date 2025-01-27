@@ -6,21 +6,14 @@
 #include "WaveGenerator.h"
 
 
-WaveGenerator::WaveGenerator() {
-    for(float & i : m_data) {
-        i = 0.0f;
-    }
-}
-
-
-void WaveGenerator::fill(const GenericWave& wave) {
-
-    wave.fill(m_data, size);
-    notifyDataChanged();
+WaveGenerator::WaveGenerator(size_t tableSize) {
+    mTableSize = tableSize;
+    m_data = new float[mTableSize];
+    std::fill(m_data, m_data + mTableSize, 0.0f);
 }
 
 void WaveGenerator::fill(const float* data) {
-    for(size_t i = 0; i < size; i++) {
+    for(size_t i = 0; i < mTableSize; i++) {
         m_data[i] = data[i];
     }
     notifyDataChanged();
@@ -34,7 +27,7 @@ void WaveGenerator::addOnDataChangedListener(const std::function<void(const floa
     onDataChangedListeners.push_back(listener);
 
     // notifies first state
-    listener(m_data, size);
+    listener(m_data, mTableSize);
 }
 
 void WaveGenerator::removeOnDataChangedListener() {
@@ -43,6 +36,6 @@ void WaveGenerator::removeOnDataChangedListener() {
 
 void WaveGenerator::notifyDataChanged() {
     for(const auto& listener: onDataChangedListeners) {
-        listener(m_data, size);
+        listener(m_data, mTableSize);
     }
 }

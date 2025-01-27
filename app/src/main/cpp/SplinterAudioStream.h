@@ -50,12 +50,15 @@ public:
 
     void setFrequency(float f) const;
 
+    int getWavetableSize() const;
+
+    void setWavetableSize(int size);
+
 private:
 
     class MyDataCallback : public oboe::AudioStreamDataCallback {
     public:
         float frequency = 420;
-        float offset = 0;
 
         MyDataCallback(SplinterAudioStream *parent) : mParent(parent) {}
 
@@ -84,6 +87,7 @@ private:
 
     static constexpr int kChannelCount = 2;
 
+    int wavetableSize = TABLE_SIZE;
 public:
 
     std::shared_ptr<MyDataCallback> mDataCallback;

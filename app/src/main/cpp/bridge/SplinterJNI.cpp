@@ -42,9 +42,10 @@ static SplinterAudioStream sPlayer;
  * Native (JNI) implementation of AudioPlayer.startAudiostreamNative()
  */
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_initializeBridge(
-        JNIEnv* env, jobject) {
+        JNIEnv* env, jobject, jint wavetableSize) {
     // Save javaVM globally
     env->GetJavaVM(&javaVM);
+    sPlayer.setWavetableSize(wavetableSize);
     sPlayer.open();
 }
 
@@ -109,7 +110,7 @@ JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
 
 JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_getTableSize(
         JNIEnv* env, jobject) {
-    return (jint)TABLE_SIZE;
+    return (jint)sPlayer.getWavetableSize();
 }
 
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_removeAudioListener(
@@ -128,18 +129,10 @@ JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
     oboe::DefaultStreamValues::FramesPerBurst = (int32_t) framesPerBurst;
 }
 
-JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_setSineFrequency(
-        JNIEnv* env, jobject,
-        jfloat freq
+JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_setFrequency(
+        JNIEnv* env, jobject,jfloat freq
 ) {
-    sPlayer.mDataCallback->frequency = freq;
-}
-
-JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_setSecondOffset(
-        JNIEnv* env, jobject,
-        jfloat freq
-) {
-    sPlayer.mDataCallback->offset = freq;
+    sPlayer.setFrequency(freq);
 }
 
 #ifdef __cplusplus

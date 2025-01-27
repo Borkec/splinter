@@ -2,7 +2,7 @@ package com.sintegra.splinter.data.service
 
 object NativeAudioBridge {
 
-    external fun initializeBridge()
+    external fun initializeBridge(size: Int)
     external fun getTableSize(): Int
 
     external fun openAudioStream(): Int
@@ -16,7 +16,6 @@ object NativeAudioBridge {
     external fun addAudioCursorListener(audioFrameListener: AudioCursorListener)
 
     external fun setDefaultStreamValues(sampleRate: Int, framesPerBurst: Int)
-    external fun setSineFrequency(frequency: Float)
-    external fun setSecondOffset(offset: Float)
+    external fun setFrequency(frequency: Float)
     external fun setAudioBuffer(buffer: FloatArray)
 }

@@ -4,18 +4,14 @@
 
 #include <cstddef>
 #include <functional>
-#include "generators/GenericWave.h"
 #include "const.h"
 
 class WaveGenerator {
 
 public:
 
-    static constexpr size_t size = TABLE_SIZE;
+    WaveGenerator(size_t tableSize);
 
-    WaveGenerator();
-
-    void fill(const GenericWave& wave);
     void fill(const float* data);
 
     const float* getData() const;
@@ -25,7 +21,8 @@ public:
 
 private:
 
-    float m_data[size]{};
+    size_t mTableSize;
+    float *m_data;
     void notifyDataChanged();
 
     std::vector<std::function<void(const float*, const size_t)>> onDataChangedListeners;

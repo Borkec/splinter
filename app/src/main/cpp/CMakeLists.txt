@@ -9,7 +9,7 @@ include_directories(
 # App specific sources
 set(APP_SOURCES
         SplinterAudioStream.cpp
-        SplinterJNI.cpp
+        bridge/SplinterJNI.cpp
         WaveGenerator.cpp
         bridge/NativeCallback.cpp
         bridge/jni_utils.cpp

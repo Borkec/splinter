@@ -21,9 +21,6 @@ static const char *TAG = "SineAudioStream";
 #include <android/log.h>
 #include <cmath>
 #include <SplinterAudioStream.h>
-#include <generators/SineWave.h>
-#include "generators/SquareWave.h"
-#include "generators/TriangleWave.h"
 #include "bridge/NativeCallback.h"
 #include "bridge/jni_utils.h"
 
@@ -31,7 +28,7 @@ using namespace oboe;
 
 SplinterAudioStream::SplinterAudioStream() {
 
-    waveGenerator = std::make_shared<WaveGenerator>();
+    waveGenerator = std::make_shared<WaveGenerator>(wavetableSize);
 }
 
 oboe::Result SplinterAudioStream::open() {
@@ -70,6 +67,15 @@ void SplinterAudioStream::setFrequency(float f) const {
     mDataCallback->frequency = f;
 }
 
+int SplinterAudioStream::getWavetableSize() const {
+    return wavetableSize;
+}
+
+void SplinterAudioStream::setWavetableSize(int size) {
+    waveGenerator = std::make_shared<WaveGenerator>(size);
+    wavetableSize = size;
+}
+
 void SplinterAudioStream::setCursorCallback(NativeCallback *callback) {
     cursorCallback = callback;
 }
@@ -89,7 +95,7 @@ DataCallbackResult SplinterAudioStream::MyDataCallback::onAudioReady(
         int32_t numFrames) {
 
     auto wave = mParent->waveGenerator->getData();
-    size_t waveSize = WaveGenerator::size;
+    size_t waveSize = mParent->wavetableSize;
     // We requested float when we built the stream.
     auto output = (float *) audioData;
     int sr = audioStream->getSampleRate();
