@@ -5,7 +5,6 @@ import com.sintegra.splinter.model.WaveModel
 import com.sintegra.splinter.model.WaveType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +26,7 @@ interface AudioRepository {
 
     fun setOffset(offset: Float)
 
-    fun setWaveType(waveType: WaveType)
+    fun setWaveType(waveType: WaveType, customWave: List<Float>? = null)
 }
 
 class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepository {
@@ -71,7 +70,7 @@ class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepositor
         audioSource.setOffset(offset)
     }
 
-    override fun setWaveType(waveType: WaveType) {
-        _currentWave.value = WaveModel(waveType)
+    override fun setWaveType(waveType: WaveType, customWave: List<Float>?) {
+        _currentWave.value = WaveModel(waveType, customWave)
     }
 }

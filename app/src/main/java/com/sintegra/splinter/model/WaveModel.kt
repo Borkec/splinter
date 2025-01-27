@@ -4,12 +4,11 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.exp
-import kotlin.math.pow
 import kotlin.math.sin
 
 data class WaveModel(val waveType: WaveType, val customAudioData: List<Float>? = null) {
 
-    val audioData: FloatArray = generate(2048)
+    val audioData: FloatArray = generate(WAVETABLE_SIZE)
 
     private fun generate(size: Int): FloatArray {
         if (customAudioData != null) return customAudioData.toFloatArray()

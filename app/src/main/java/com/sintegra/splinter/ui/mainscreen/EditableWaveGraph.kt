@@ -1,6 +1,5 @@
 package com.sintegra.splinter.ui.mainscreen
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,10 +12,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,17 +33,20 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sintegra.splinter.model.WAVETABLE_SIZE
 import java.util.UUID
-import kotlin.math.abs
 
 @Composable
 fun EditableWaveGraph(
-    points: List<Float>,
-    onCustomWaveSaved: () -> Unit,
+    onWaveSave: () -> Unit,
+    onSetCustomWave: (List<Float>) -> Unit,
+    onStartSound: () -> Unit = {},
+    onStopSound: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var mSize: Size? by remember { mutableStateOf(null) }
-
+    var isSoundPlaying by remember { mutableStateOf(false) }
+    var selectedPoint: EditableTouchInput? by remember { mutableStateOf(null) }
     var anchorPoints: List<EditableTouchInput> by remember(mSize) {
         mutableStateOf(
             mSize?.let {
@@ -54,11 +58,39 @@ fun EditableWaveGraph(
         )
     }
 
-    var selectedPoint: EditableTouchInput? by remember {
-        mutableStateOf(null)
+    LaunchedEffect(anchorPoints) {
+        onSetCustomWave(
+            mSize?.let {
+                generatePoints(anchorPoints, it)
+            } ?: List(WAVETABLE_SIZE) { 0f }
+        )
     }
 
-    Column(modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier.fillMaxHeight(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(100.dp, 50.dp)
+                .padding(bottom = 12.dp)
+                .background(if (isSoundPlaying) Color.Red else Color.Green, RoundedCornerShape(4.dp))
+                .clickable {
+                    when (isSoundPlaying) {
+                        false -> onStopSound()
+                        true -> onStartSound()
+                    }
+                    isSoundPlaying = !isSoundPlaying
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = if (!isSoundPlaying) "Play" else "Stop",
+                color = Color.Black,
+                fontSize = 12.sp
+            )
+        }
 
         Canvas(
             modifier = modifier
@@ -81,6 +113,10 @@ fun EditableWaveGraph(
                 }
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
+                        if (change.position.y < 0 || change.position.y > size.height || change.position.x < 0 || change.position.x > size.width) {
+                            return@detectDragGestures
+                        }
+
                         findNearestPoint(anchorPoints, change.position)?.let {
                             val newPoint = it.copy(position = change.position)
                             anchorPoints = (anchorPoints - it + newPoint).sortedBy { it.position.x }
@@ -108,14 +144,20 @@ fun EditableWaveGraph(
             for (anchorPoint in anchorPoints) {
                 SplinterPointer(anchorPoint.position, showRing = anchorPoint == selectedPoint)
             }
-
         }
 
         Box(
-            Modifier
+            modifier = Modifier
                 .size(200.dp, 50.dp)
                 .background(Color.White, RoundedCornerShape(4.dp))
-                .clickable { onCustomWaveSaved() },
+                .clickable {
+                    onSetCustomWave(
+                        mSize?.let {
+                            generatePoints(anchorPoints, it)
+                        } ?: List(WAVETABLE_SIZE) { 0f }
+                    )
+                    onWaveSave()
+                },
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -126,6 +168,41 @@ fun EditableWaveGraph(
         }
     }
 
+}
+
+fun generatePoints(anchorPoints: List<EditableTouchInput>, canvasSize: Size): List<Float> {
+    if (anchorPoints.size < 2) return emptyList()
+
+    val deltaX: Float = canvasSize.width / WAVETABLE_SIZE
+
+    val outPoints = mutableListOf<Float>()
+
+    var anchorPointIdx = 1
+    var first = anchorPoints[0]
+    var second = anchorPoints[anchorPointIdx]
+    var i = 0f
+
+    while (i < canvasSize.width) {
+
+        if (i >= second.position.x) {
+            first = second.copy()
+            second = anchorPoints[anchorPointIdx++]
+        }
+
+        // Calculate the slope between the two anchor points
+        val slope = (second.position.y - first.position.y) / (second.position.x - first.position.x)
+        val yIntercept = first.position.y - slope * first.position.x
+        val y = slope * i + yIntercept
+
+
+        if (!y.isNaN()) {
+            outPoints.add(2 * (y - canvasSize.height / 2f) / canvasSize.height)
+        }
+
+        i += deltaX
+    }
+
+    return outPoints
 }
 
 fun findNearestPoint(anchorPoints: List<EditableTouchInput>, point: Offset): EditableTouchInput? {
@@ -142,40 +219,9 @@ fun findNearestPoint(anchorPoints: List<EditableTouchInput>, point: Offset): Edi
 
     }
 
-    if (nearestPoint != null && nearestPoint.position.squaredDistanceTo(point) > 10000) return null
+    if (nearestPoint != null && nearestPoint.position.squaredDistanceTo(point) > 30000) return null
 
     return nearestPoint
-}
-
-fun findIfPointerBetween(anchorPoints: List<Offset>, point: Offset): Boolean {
-    var isPtBetween = false
-    for (i in 0 until anchorPoints.size - 1) {
-        val first = anchorPoints[i]
-        val second = anchorPoints[i + 1]
-
-        isPtBetween = isPtBetween or isPointerBetween(point, first, second).also { Log.d("update", "isBetween: ${it}") }
-    }
-    return isPtBetween
-}
-
-fun isPointerBetween(pointer: Offset, start: Offset, end: Offset): Boolean {
-    // Calculate the vector from start to pointer and start to end
-    val vectorStartToPointer = pointer - start
-    val vectorStartToEnd = end - start
-
-    // Check if the pointer is collinear with the line segment
-    val crossProduct = vectorStartToPointer.x * vectorStartToEnd.y - vectorStartToPointer.y * vectorStartToEnd.x
-    Log.d("update", "$start $end $pointer crossProduct: $crossProduct")
-    if (abs(crossProduct) > 10000f) return false // Not collinear
-
-    // Check if the pointer lies within the bounds of the segment
-    val dotProduct = vectorStartToPointer.x * vectorStartToEnd.x + vectorStartToPointer.y * vectorStartToEnd.y
-    if (dotProduct < 0f) return false // Pointer is behind the start point
-
-    val segmentLengthSquared = vectorStartToEnd.x * vectorStartToEnd.x + vectorStartToEnd.y * vectorStartToEnd.y
-    if (dotProduct > segmentLengthSquared) return false // Pointer is beyond the end point
-
-    return true // Pointer is on the line segment
 }
 
 fun Offset.squaredDistanceTo(other: Offset): Float {
@@ -193,5 +239,5 @@ data class EditableTouchInput(
 @Preview
 @Composable
 fun EditableWaveGraphPreview(modifier: Modifier = Modifier) {
-    EditableWaveGraph(listOf(), { }, Modifier)
+    EditableWaveGraph({}, {}, {}, {}, Modifier)
 }

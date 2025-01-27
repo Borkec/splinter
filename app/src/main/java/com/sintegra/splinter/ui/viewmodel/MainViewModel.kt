@@ -44,8 +44,21 @@ class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() 
         _screenViewState.value = MainViewSate.ScreenViewState(CurrentScreen.CUSTOM_PICKER)
     }
 
-    fun onCustomWaveSaved() {
+    fun onSetCustomWave(customWave: List<Float>) {
+        audioRepository.setWaveType(WaveType.CUSTOM, customWave)
+    }
+
+    fun closeCustomScreen() {
         _screenViewState.value = MainViewSate.ScreenViewState(CurrentScreen.MAIN)
+    }
+
+    fun onCustomWaveEditorStopSound() {
+        audioRepository.setSineFrequency(420f)
+        audioRepository.startAudioStream()
+    }
+
+    fun onCustomWaveEditorStartSound() {
+        audioRepository.stopAudioStream()
     }
 }
 

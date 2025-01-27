@@ -30,7 +30,10 @@ fun MainScreen(viewModel: MainViewModel = koinViewModel()) {
         onRelease = viewModel::onRelease,
         onWavePicked = viewModel::onWaveTypeSelected,
         onCustomWaveClicked = viewModel::onCustomWavePicked,
-        onCustomWaveSaved = viewModel::onCustomWaveSaved
+        onSetCustomWave = viewModel::onSetCustomWave,
+        onCustomWaveEditorStartSound = viewModel::onCustomWaveEditorStartSound,
+        onCustomWaveEditorStopSound = viewModel::onCustomWaveEditorStopSound,
+        onWaveSave = viewModel::closeCustomScreen
     )
 }
 
@@ -43,7 +46,10 @@ fun MainScreenContent(
     onRelease: () -> Unit = {},
     onWavePicked: (WaveType) -> Unit,
     onCustomWaveClicked: () -> Unit,
-    onCustomWaveSaved: () -> Unit
+    onSetCustomWave: (List<Float>) -> Unit,
+    onCustomWaveEditorStartSound: () -> Unit,
+    onCustomWaveEditorStopSound: () -> Unit,
+    onWaveSave: () -> Unit
 ) {
 
     Box {
@@ -64,7 +70,7 @@ fun MainScreenContent(
             }
 
             CurrentScreen.CUSTOM_PICKER -> {
-                EditableWaveGraph(selectedWave.waveData, onCustomWaveSaved)
+                EditableWaveGraph(onWaveSave, onSetCustomWave, onCustomWaveEditorStartSound, onCustomWaveEditorStopSound)
             }
         }
 
@@ -75,6 +81,6 @@ fun MainScreenContent(
 @Composable
 fun DefaultPreview() {
     SplinterTheme {
-        MainScreenContent(MainViewSate.SelectedWave.initial, MainViewSate.ScreenViewState(CurrentScreen.MAIN), {}, { _, _ -> }, {}, {}, {}, {})
+        MainScreenContent(MainViewSate.SelectedWave.initial, MainViewSate.ScreenViewState(CurrentScreen.MAIN), {}, { _, _ -> }, {}, {}, {}, {}, {}, {}, {})
     }
 }
