@@ -1,8 +1,10 @@
 package com.sintegra.splinter.ui.mainscreen
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,21 +21,22 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import java.util.UUID
 
 @Composable
 fun SplinterArea(
-    modifier: Modifier = Modifier,
     overlay: @Composable (Modifier) -> Unit,
     onPressed: () -> Unit,
     onHold: (Float, Float) -> Unit,
-    onRelease: () -> Unit
+    onRelease: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val touchCoords: MutableState<Offset?> = remember { mutableStateOf(null) }
-
     val points: MutableState<List<TouchPoint>> = remember { mutableStateOf(emptyList()) }
+
     val fadeDuration = 100L
 
     LaunchedEffect(points) {
@@ -51,26 +54,31 @@ fun SplinterArea(
         }
     }
 
+    val pointerColor = MaterialTheme.colors.primary
 
-    Surface(Modifier
-        .fillMaxSize()
-        .pointerInput(Unit) {
-            getPointerInput(touchCoords, onPressed, onHold, onRelease)
-        }
-        .pointerInput(Unit) {
-            getDragInput(points)
-        }
+    Surface(
+        modifier = modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                getPointerInput(touchCoords, onPressed, onHold, onRelease)
+            }
+            .pointerInput(Unit) {
+                getDragInput(points)
+            },
+        color = MaterialTheme.colors.background
     ) {
 
         overlay(Modifier.zIndex(1f))
 
-        Canvas(Modifier.graphicsLayer(renderEffect = BlurEffect(5f, 5f))) {
-            for (i in 0 until points.value.size - 1) { // Stop at the second-to-last element
+        Canvas(
+            modifier = Modifier.graphicsLayer(renderEffect = BlurEffect(5f, 5f))
+        ) {
+            for (i in 0 until points.value.size - 1) {
                 val current = points.value[i]
                 val next = points.value[i + 1]
 
                 drawLine(
-                    Color.LightGray,
+                    pointerColor,
                     current.position,
                     next.position,
                     strokeWidth = 20f * current.alpha,
@@ -82,8 +90,13 @@ fun SplinterArea(
         }
 
         touchCoords.value?.let { midPoint ->
-            Canvas(Modifier) {
-                SplinterPointer(midPoint)
+            Canvas(
+                modifier = Modifier
+            ) {
+                SplinterPointer(
+                    midPoint = midPoint,
+                    color = pointerColor
+                )
             }
         }
     }
@@ -128,6 +141,12 @@ suspend fun PointerInputScope.getDragInput(
             points.value += TouchPoint(position = change.position, timestamp = currentTime)
         }
     )
+}
+
+@Preview
+@Composable
+fun SplinterAreaPreview() {
+    SplinterArea({}, {}, { _, _ -> }, {})
 }
 
 data class TouchPoint(

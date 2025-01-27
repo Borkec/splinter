@@ -3,6 +3,7 @@ package com.sintegra.splinter.ui.mainscreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,7 +56,7 @@ fun WavePicker(
     }
     AnimatedVisibility(expanded, enter = fadeIn(), exit = fadeOut()) {
         LazyColumn(modifier.fillMaxHeight(), verticalArrangement = Arrangement.Top) {
-            items(MainViewSate.SelectedWave.common) { waveState ->
+            items(MainViewSate.SelectedWave.common, key = { it.waveType }) { waveState ->
                 WavePickerElement(
                     selectedWave = waveState,
                     onClick = {
@@ -91,10 +93,10 @@ fun WavePickerElement(
             Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .border(2.dp, Color.LightGray, RoundedCornerShape(6.dp))
+                .border(2.dp, color = MaterialTheme.colors.background, shape = RoundedCornerShape(6.dp))
+                .background(MaterialTheme.colors.primary, shape = RoundedCornerShape(6.dp))
                 .clickable { onClick() }
                 .drawBehind {
-
                     drawCircle(Color.White, radius = 6f, center = Offset(size.center.x + size.width / 2, size.center.y))
                 },
             contentAlignment = Alignment.Center
@@ -102,7 +104,8 @@ fun WavePickerElement(
             Text(
                 fontSize = 16.sp,
                 text = selectedWave.waveName,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.background
             )
         }
 

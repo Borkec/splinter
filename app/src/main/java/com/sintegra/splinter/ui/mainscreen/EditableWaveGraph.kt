@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,6 +67,9 @@ fun EditableWaveGraph(
         )
     }
 
+    val waveLineColor = MaterialTheme.colors.primary
+    val lineColor = MaterialTheme.colors.background
+
     Column(
         modifier = modifier.fillMaxHeight(),
         verticalArrangement = Arrangement.Center,
@@ -95,8 +99,8 @@ fun EditableWaveGraph(
         Canvas(
             modifier = modifier
                 .height(200.dp)
-                .background(Color.DarkGray)
-                .border(width = 1.dp, color = Color.White)
+                .background(MaterialTheme.colors.onBackground)
+                .border(width = 1.dp, color = MaterialTheme.colors.primary)
                 .fillMaxWidth()
                 .pointerInput(Unit) {
                     detectTapGestures(
@@ -127,29 +131,29 @@ fun EditableWaveGraph(
         ) {
             mSize = size
 
-            drawPoints(
-                points = anchorPoints.map { it.position },
-                pointMode = PointMode.Polygon,
-                color = Color.LightGray,
-                strokeWidth = 3f
-            )
-
             drawLine(
-                color = Color.Gray,
+                color = lineColor,
                 start = Offset(0f, size.height / 2),
                 end = Offset(size.width, size.height / 2),
                 strokeWidth = 3f
             )
 
+            drawPoints(
+                points = anchorPoints.map { it.position },
+                pointMode = PointMode.Polygon,
+                color = waveLineColor,
+                strokeWidth = 3f
+            )
+
             for (anchorPoint in anchorPoints) {
-                SplinterPointer(anchorPoint.position, showRing = anchorPoint == selectedPoint)
+                SplinterPointer(anchorPoint.position, showRing = anchorPoint == selectedPoint, color = waveLineColor)
             }
         }
 
         Box(
             modifier = Modifier
                 .size(200.dp, 50.dp)
-                .background(Color.White, RoundedCornerShape(4.dp))
+                .background(MaterialTheme.colors.primary, RoundedCornerShape(4.dp))
                 .clickable {
                     onSetCustomWave(
                         mSize?.let {
@@ -162,7 +166,7 @@ fun EditableWaveGraph(
         ) {
             Text(
                 text = "Save",
-                color = Color.Black,
+                color = MaterialTheme.colors.background,
                 fontSize = 12.sp
             )
         }

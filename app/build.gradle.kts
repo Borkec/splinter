@@ -72,7 +72,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.compose.ui)
     implementation(libs.compose.material)
-
     implementation(libs.koin.android.compose)
 
     implementation(libs.oboe)

@@ -64,12 +64,6 @@ enum class WaveType(val generator: (FloatArray, Int, Int) -> Unit) {
         }
     ),
 
-    HALF_SINE(
-        { array, i, size ->
-            array[i] = abs(sin(i.toFloat() / size.toFloat() * 2 * PI)).toFloat()
-        }
-    ),
-
     WOBBLE(
         { array, i, size ->
             val normalized = i.toFloat() / size

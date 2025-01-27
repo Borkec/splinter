@@ -19,6 +19,8 @@ package com.sintegra.splinter.ui
 import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,20 +35,26 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         NativeAudioBridge.openAudioStream()
         setDefaultStreamValues()
 
+
         setContent {
             SplinterTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color =  MaterialTheme.colors.background.also { Log.d("debug_log", "$it") }
                 ) {
                     MainScreen()
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
     }
 
     override fun onDestroy() {
