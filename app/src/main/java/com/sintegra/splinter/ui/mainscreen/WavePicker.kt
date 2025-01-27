@@ -35,28 +35,51 @@ import com.sintegra.splinter.model.WaveType
 import com.sintegra.splinter.ui.viewmodel.MainViewSate
 
 @Composable
-fun WavePicker(selectedWave: MainViewSate.SelectedWave, onWavePicked: (WaveType) -> Unit, modifier: Modifier = Modifier) {
+fun WavePicker(
+    selectedWave: MainViewSate.SelectedWave,
+    onWavePicked: (WaveType) -> Unit,
+    onCustomWaveClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     var expanded by remember { mutableStateOf(false) }
 
-
-    AnimatedVisibility(!expanded, enter = fadeIn(), exit = fadeOut())  {
-        WavePickerElement(selectedWave, onClick = { expanded = true })
+    AnimatedVisibility(!expanded, enter = fadeIn(), exit = fadeOut()) {
+        WavePickerElement(
+            selectedWave = selectedWave,
+            onClick = { expanded = true },
+            onCustomWaveClicked = onCustomWaveClicked,
+            modifier
+        )
     }
-    AnimatedVisibility(expanded, enter = fadeIn(), exit = fadeOut())  {
-        LazyColumn(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Top) {
+    AnimatedVisibility(expanded, enter = fadeIn(), exit = fadeOut()) {
+        LazyColumn(modifier.fillMaxHeight(), verticalArrangement = Arrangement.Top) {
             items(MainViewSate.SelectedWave.common) { waveState ->
-                WavePickerElement(waveState, onClick = {
-                    onWavePicked(waveState.waveType)
-                    expanded = false
-                })
+                WavePickerElement(
+                    selectedWave = waveState,
+                    onClick = {
+                        onWavePicked(waveState.waveType)
+                        expanded = false
+                    },
+                    onCustomWaveClicked = onCustomWaveClicked
+                )
             }
         }
     }
 }
 
 @Composable
-fun WavePickerElement(selectedWave: MainViewSate.SelectedWave, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun WavePickerElement(
+    selectedWave: MainViewSate.SelectedWave,
+    onClick: () -> Unit,
+    onCustomWaveClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    val customClickable = if (selectedWave.waveType == WaveType.CUSTOM) {
+        Modifier.clickable { onCustomWaveClicked() }
+    } else Modifier
+
     Row(
         modifier = modifier
             .height(80.dp)
@@ -72,7 +95,7 @@ fun WavePickerElement(selectedWave: MainViewSate.SelectedWave, onClick: () -> Un
                 .clickable { onClick() }
                 .drawBehind {
 
-                    drawCircle(Color.White, radius = 6f, center = Offset(size.center.x + size.width/2, size.center.y))
+                    drawCircle(Color.White, radius = 6f, center = Offset(size.center.x + size.width / 2, size.center.y))
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -83,12 +106,17 @@ fun WavePickerElement(selectedWave: MainViewSate.SelectedWave, onClick: () -> Un
             )
         }
 
-        WaveGraph(selectedWave.waveData, Modifier.weight(2f))
+        WaveGraph(
+            selectedWave.waveData,
+            Modifier
+                .weight(2f)
+                .then(customClickable)
+        )
     }
 }
 
 @Preview
 @Composable
 fun WavePickerPreview(modifier: Modifier = Modifier) {
-    WavePicker(MainViewSate.SelectedWave.initial, {})
+    WavePicker(MainViewSate.SelectedWave.initial, {}, {})
 }

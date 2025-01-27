@@ -7,27 +7,26 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import java.util.UUID
 
 @Composable
 fun SplinterArea(
     modifier: Modifier = Modifier,
+    overlay: @Composable (Modifier) -> Unit,
     onPressed: () -> Unit,
     onHold: (Float, Float) -> Unit,
     onRelease: () -> Unit
@@ -63,6 +62,8 @@ fun SplinterArea(
         }
     ) {
 
+        overlay(Modifier.zIndex(1f))
+
         Canvas(Modifier.graphicsLayer(renderEffect = BlurEffect(5f, 5f))) {
             for (i in 0 until points.value.size - 1) { // Stop at the second-to-last element
                 val current = points.value[i]
@@ -82,21 +83,11 @@ fun SplinterArea(
 
         touchCoords.value?.let { midPoint ->
             Canvas(Modifier) {
-                drawCircle(
-                    color = Color.White,
-                    radius = 20f,
-                    center = midPoint
-                )
-
-                drawCircle(
-                    color = Color.White,
-                    style = Stroke(5f),
-                    radius = 30f,
-                    center = midPoint
-                )
+                SplinterPointer(midPoint)
             }
         }
     }
+
 }
 
 suspend fun PointerInputScope.getPointerInput(

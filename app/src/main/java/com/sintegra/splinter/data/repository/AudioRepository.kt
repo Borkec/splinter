@@ -41,7 +41,7 @@ class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepositor
     init {
         audioCoroutineScope.launch {
             _currentWave.collect { wave ->
-                audioSource.setAudioBuffer(wave.generate(waveTableSize))
+                audioSource.setAudioBuffer(wave.audioData)
             }
         }
     }

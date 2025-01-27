@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.sintegra.splinter.model.WaveModel
 import com.sintegra.splinter.model.WaveType
 import com.sintegra.splinter.ui.theme.SplinterTheme
+import com.sintegra.splinter.ui.viewmodel.CurrentScreen
 import com.sintegra.splinter.ui.viewmodel.MainViewModel
 import com.sintegra.splinter.ui.viewmodel.MainViewSate
 import org.koin.androidx.compose.koinViewModel
@@ -19,34 +20,54 @@ import org.koin.androidx.compose.koinViewModel
 fun MainScreen(viewModel: MainViewModel = koinViewModel()) {
 
     val currentWaveModel by viewModel.selectedWaveViewState.collectAsState()
+    val screenViewState by viewModel.screenViewState.collectAsState()
 
-    MainScreen(
+    MainScreenContent(
         selectedWave = currentWaveModel,
+        screenViewState = screenViewState,
         onPressed = viewModel::onPressed,
         onHold = viewModel::onHold,
         onRelease = viewModel::onRelease,
-        onWavePicked = viewModel::onWaveTypeSelected
+        onWavePicked = viewModel::onWaveTypeSelected,
+        onCustomWaveClicked = viewModel::onCustomWavePicked,
+        onCustomWaveSaved = viewModel::onCustomWaveSaved
     )
 }
 
 @Composable
-fun MainScreen(
+fun MainScreenContent(
     selectedWave: MainViewSate.SelectedWave,
+    screenViewState: MainViewSate.ScreenViewState,
     onPressed: () -> Unit = {},
     onHold: (Float, Float) -> Unit = { _, _ -> },
     onRelease: () -> Unit = {},
-    onWavePicked: (WaveType) -> Unit
+    onWavePicked: (WaveType) -> Unit,
+    onCustomWaveClicked: () -> Unit,
+    onCustomWaveSaved: () -> Unit
 ) {
 
     Box {
-        SplinterArea(
-            Modifier.background(Color.Black),
-            onPressed,
-            onHold,
-            onRelease
-        )
+        when (screenViewState.screen) {
+            CurrentScreen.MAIN -> {
+                SplinterArea(
+                    Modifier.background(Color.Black),
+                    overlay = { modifier ->
 
-        WavePicker(selectedWave, onWavePicked)
+                    },
+                    onPressed,
+                    onHold,
+                    onRelease
+                )
+
+                WavePicker(selectedWave, onWavePicked, onCustomWaveClicked)
+
+            }
+
+            CurrentScreen.CUSTOM_PICKER -> {
+                EditableWaveGraph(selectedWave.waveData, onCustomWaveSaved)
+            }
+        }
+
     }
 }
 
@@ -54,6 +75,6 @@ fun MainScreen(
 @Composable
 fun DefaultPreview() {
     SplinterTheme {
-        MainScreen(MainViewSate.SelectedWave.initial, {}, { _, _ -> }, {}, {})
+        MainScreenContent(MainViewSate.SelectedWave.initial, MainViewSate.ScreenViewState(CurrentScreen.MAIN), {}, { _, _ -> }, {}, {}, {}, {})
     }
 }

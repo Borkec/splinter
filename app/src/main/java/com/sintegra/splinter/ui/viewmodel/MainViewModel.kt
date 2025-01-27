@@ -9,10 +9,8 @@ import com.sintegra.splinter.ui.viewmodel.MainViewSate.SelectedWave.Companion.fr
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() {
 
@@ -21,6 +19,9 @@ class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() 
             .map { waveModel ->
                 fromWaveModel(waveModel)
             }.stateIn(viewModelScope, SharingStarted.Lazily, MainViewSate.SelectedWave.initial)
+
+    private val _screenViewState: MutableStateFlow<MainViewSate.ScreenViewState> = MutableStateFlow(MainViewSate.ScreenViewState(CurrentScreen.MAIN))
+    val screenViewState: StateFlow<MainViewSate.ScreenViewState> = _screenViewState
 
     fun onPressed() {
         audioRepository.startAudioStream()
@@ -39,6 +40,13 @@ class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() 
         audioRepository.setWaveType(waveType)
     }
 
+    fun onCustomWavePicked() {
+        _screenViewState.value = MainViewSate.ScreenViewState(CurrentScreen.CUSTOM_PICKER)
+    }
+
+    fun onCustomWaveSaved() {
+        _screenViewState.value = MainViewSate.ScreenViewState(CurrentScreen.MAIN)
+    }
 }
 
 sealed class MainViewSate {
@@ -48,9 +56,12 @@ sealed class MainViewSate {
             val common = WaveType.entries.map { waveType -> fromWaveModel(WaveModel(waveType)) }
 
             fun fromWaveModel(waveModel: WaveModel) =
-                SelectedWave(waveModel.waveType.toString(), waveModel.waveType, waveModel.generate(2048).toList())
+                SelectedWave(waveModel.waveType.toString(), waveModel.waveType, waveModel.audioData.toList())
         }
     }
 
+    data class ScreenViewState(val screen: CurrentScreen)
 }
-
+enum class CurrentScreen {
+    MAIN, CUSTOM_PICKER
+}
