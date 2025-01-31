@@ -23,7 +23,6 @@ import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
@@ -43,8 +42,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             SplinterTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color =  MaterialTheme.colors.background.also { Log.d("debug_log", "$it") }
+                    modifier = Modifier,
+                    color =  MaterialTheme.colors.background
                 ) {
                     MainScreen()
                 }

@@ -1,16 +1,11 @@
 package com.sintegra.splinter.ui.mainscreen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.sintegra.splinter.model.WaveModel
 import com.sintegra.splinter.model.WaveType
 import com.sintegra.splinter.ui.theme.SplinterTheme
 import com.sintegra.splinter.ui.viewmodel.CurrentScreen
@@ -60,9 +55,6 @@ fun MainScreenContent(
         when (screenViewState.screen) {
             CurrentScreen.MAIN -> {
                 SplinterArea(
-                    overlay = { modifier ->
-
-                    },
                     onPressed,
                     onHold,
                     onRelease,
@@ -70,7 +62,6 @@ fun MainScreenContent(
                 )
 
                 WavePicker(selectedWave, onWavePicked, onCustomWaveClicked)
-
             }
 
             CurrentScreen.CUSTOM_PICKER -> {

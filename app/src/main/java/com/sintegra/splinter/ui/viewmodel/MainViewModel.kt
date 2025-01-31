@@ -3,6 +3,8 @@ package com.sintegra.splinter.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sintegra.splinter.data.repository.AudioRepository
+import com.sintegra.splinter.model.Modulation
+import com.sintegra.splinter.model.ModulationType
 import com.sintegra.splinter.model.WaveModel
 import com.sintegra.splinter.model.WaveType
 import com.sintegra.splinter.ui.viewmodel.MainViewSate.SelectedWave.Companion.fromWaveModel
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() {
+
 
     val selectedWaveViewState: StateFlow<MainViewSate.SelectedWave> =
         audioRepository.currentWave
@@ -28,7 +31,7 @@ class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() 
     }
 
     fun onHold(x: Float, y: Float) {
-        audioRepository.setSineFrequency(y)
+        audioRepository.setModulation(y, Modulation(ModulationType.FREQUENCY, 20f, 1024f))
     }
 
     fun onRelease() {
@@ -45,6 +48,7 @@ class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() 
 
     fun onSetCustomWave(customWave: List<Float>) {
         audioRepository.setWaveType(WaveType.CUSTOM, customWave)
+        audioRepository.stopAudioStream()
     }
 
     fun closeCustomScreen() {

@@ -1,8 +1,12 @@
 package com.sintegra.splinter.data.repository
 
+import android.util.Log
 import com.sintegra.splinter.data.service.AudioSource
+import com.sintegra.splinter.model.Modulation
+import com.sintegra.splinter.model.ModulationType
 import com.sintegra.splinter.model.WaveModel
 import com.sintegra.splinter.model.WaveType
+import com.sintegra.splinter.model.interpolateValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +26,9 @@ interface AudioRepository {
 
     fun stopAudioStream()
 
-    fun setSineFrequency(frequency: Float)
+    fun setSineFrequency(value: Float)
+
+    fun setModulation(value: Float, modulation: Modulation)
 
     fun setWaveType(waveType: WaveType, customWave: List<Float>? = null)
 }
@@ -33,7 +39,6 @@ class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepositor
     override val currentWave: StateFlow<WaveModel> = _currentWave
 
     private val audioCoroutineScope = CoroutineScope(Dispatchers.Default)
-    private val waveTableSize = audioSource.getWaveTableSize()
 
     init {
         audioCoroutineScope.launch {
@@ -58,6 +63,14 @@ class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepositor
 
     override fun stopAudioStream() {
         audioSource.stopAudioStream()
+    }
+
+    override fun setModulation(value: Float, modulation: Modulation) {
+        when(modulation.type) {
+            ModulationType.FREQUENCY -> {
+                audioSource.setSineFrequency(modulation.interpolateValue(value))
+            }
+        }
     }
 
     override fun setSineFrequency(frequency: Float) {

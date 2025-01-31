@@ -34,6 +34,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sintegra.splinter.core.ui.SplinterPointer
 import com.sintegra.splinter.model.WAVETABLE_SIZE
 import java.util.UUID
 

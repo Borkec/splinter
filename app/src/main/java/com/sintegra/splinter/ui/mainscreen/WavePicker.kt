@@ -25,10 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.center
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,7 +42,7 @@ fun WavePicker(
 
     var expanded by remember { mutableStateOf(false) }
 
-    AnimatedVisibility(!expanded, enter = fadeIn(), exit = fadeOut()) {
+    AnimatedVisibility(visible = !expanded, enter = fadeIn(), exit = fadeOut()) {
         WavePickerElement(
             selectedWave = selectedWave,
             onClick = { expanded = true },
@@ -54,9 +50,10 @@ fun WavePicker(
             modifier
         )
     }
-    AnimatedVisibility(expanded, enter = fadeIn(), exit = fadeOut()) {
-        LazyColumn(modifier.fillMaxHeight(), verticalArrangement = Arrangement.Top) {
-            items(MainViewSate.SelectedWave.common, key = { it.waveType }) { waveState ->
+
+    AnimatedVisibility(visible = expanded, enter = fadeIn(), exit = fadeOut()) {
+        LazyColumn(modifier = modifier.fillMaxHeight(), verticalArrangement = Arrangement.Top) {
+            items(items = MainViewSate.SelectedWave.common, key = { it.waveName }) { waveState ->
                 WavePickerElement(
                     selectedWave = waveState,
                     onClick = {
@@ -90,15 +87,12 @@ fun WavePickerElement(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            Modifier
+            modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .border(2.dp, color = MaterialTheme.colors.background, shape = RoundedCornerShape(6.dp))
-                .background(MaterialTheme.colors.primary, shape = RoundedCornerShape(6.dp))
-                .clickable { onClick() }
-                .drawBehind {
-                    drawCircle(Color.White, radius = 6f, center = Offset(size.center.x + size.width / 2, size.center.y))
-                },
+                .border(width = 2.dp, color = MaterialTheme.colors.background, shape = RoundedCornerShape(6.dp))
+                .background(color = MaterialTheme.colors.primary, shape = RoundedCornerShape(6.dp))
+                .clickable { onClick() },
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -110,8 +104,8 @@ fun WavePickerElement(
         }
 
         WaveGraph(
-            selectedWave.waveData,
-            Modifier
+            points = selectedWave.waveData,
+            modifier = Modifier
                 .weight(2f)
                 .then(customClickable)
         )
