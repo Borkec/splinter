@@ -1,6 +1,5 @@
 package com.sintegra.splinter.ui.mainscreen
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
@@ -20,23 +19,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun WaveGraph(
-    points: List<Float>,
+    points: List<Offset>,
     modifier: Modifier = Modifier
 ) {
-    val res = 8
-
-    var mSize: IntSize by remember { mutableStateOf(IntSize.Zero) }
-    val wave = remember(mSize) {
-        val resolution = points.size / res
-
-        points
-            .filterIndexed { index, _ -> index % res == 0 }
-            .zip(List(resolution) { it.toFloat() / resolution.toFloat() })
-            .map { (y, x) -> Offset(x * mSize.width, (mSize.height / 2) + y * (mSize.height / 2)) }
-    }
-
     val lineColor = MaterialTheme.colors.background
     val pointColor = MaterialTheme.colors.primary
+
+    var mSize: IntSize by remember { mutableStateOf(IntSize.Zero) }
 
     Canvas(
         modifier = modifier
@@ -53,7 +42,8 @@ fun WaveGraph(
         )
 
         drawPoints(
-            points = wave,
+            points = points
+                .map { (y, x) -> Offset(x * mSize.width, (mSize.height / 2) + y * (mSize.height / 2)) },
             pointMode = PointMode.Polygon,
             color = pointColor,
             strokeWidth = 5f

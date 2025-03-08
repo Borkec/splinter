@@ -7,7 +7,7 @@ import com.sintegra.splinter.data.service.AudioSource
 import com.sintegra.splinter.data.service.AudioSourceImpl
 import com.sintegra.splinter.data.service.NativeAudioBridge
 import com.sintegra.splinter.model.WAVETABLE_SIZE
-import com.sintegra.splinter.ui.viewmodel.MainViewModel
+import com.sintegra.splinter.ui.viewmodel.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -18,7 +18,10 @@ val splinterModule = module {
     single<AudioSource> { AudioSourceImpl() }
     single<AudioRepository> { AudioRepositoryImpl(get()) }
 
-    viewModelOf(::MainViewModel)
+    viewModelOf(::CustomWaveEditorViewModel)
+    viewModelOf(::PianoKeysViewModel)
+    viewModelOf(::SplinterAreaViewModel)
+    viewModelOf(::WavePickerViewModel)
 }
 
 class SplinterApplication: Application() {

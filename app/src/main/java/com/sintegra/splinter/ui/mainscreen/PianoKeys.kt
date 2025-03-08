@@ -1,6 +1,5 @@
 package com.sintegra.splinter.ui.mainscreen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -28,16 +27,16 @@ import com.sintegra.splinter.core.ui.toDp
 import com.sintegra.splinter.model.KeyColor
 import com.sintegra.splinter.model.KeyType
 import com.sintegra.splinter.ui.viewmodel.KeyViewState
+import com.sintegra.splinter.ui.viewmodel.PianoKeysViewModel
+import org.koin.androidx.compose.koinViewModel
 
 private const val WHITE_KEYS = 7;
 
 @Composable
 fun Octave(
     modifier: Modifier = Modifier,
-    onKeyPressed: (KeyType) -> Unit,
-    onKeyReleased: () -> Unit
+    viewModel: PianoKeysViewModel = koinViewModel(),
 ) {
-
     var size by remember { mutableStateOf(Size(0f, 0f)) }
     val keyHeight = remember(size) { size.height / WHITE_KEYS }
 
@@ -78,8 +77,8 @@ fun Octave(
                     )
                     .pointerInput(Unit) {
                         getPointerInput(
-                            onPressed = { onKeyPressed(Octave[index].type) },
-                            onRelease = { onKeyReleased() }
+                            onPressed = { viewModel.onPlayKey(Octave[index].type) },
+                            onRelease = { viewModel.onReleaseKey() }
                         )
                     }
                     .zIndex(
@@ -97,7 +96,7 @@ fun Octave(
 @Composable
 fun OctavePreview() {
     Box(modifier = Modifier.fillMaxSize()) {
-        Octave(Modifier.fillMaxSize(), { Log.d("onKeyPressed", it.toString()) }, {})
+        Octave(Modifier.fillMaxSize())
     }
 }
 

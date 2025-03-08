@@ -1,6 +1,5 @@
 package com.sintegra.splinter.ui.mainscreen
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -24,16 +23,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.sintegra.splinter.core.ui.SplinterPointer
 import com.sintegra.splinter.core.ui.getDragInput
 import com.sintegra.splinter.core.ui.getPointerInput
+import com.sintegra.splinter.ui.viewmodel.SplinterAreaViewModel
 import kotlinx.coroutines.delay
+import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 
 @Composable
 fun SplinterArea(
-    onPressed: () -> Unit,
-    onHold: (Float, Float) -> Unit,
-    onRelease: () -> Unit,
+    viewModel: SplinterAreaViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
+
     val touchCoords: MutableState<Offset?> = remember { mutableStateOf(null) }
     val points: MutableState<List<TouchPoint>> = remember { mutableStateOf(emptyList()) }
     var surfaceSize: Size? by remember { mutableStateOf(null) }
@@ -65,7 +65,7 @@ fun SplinterArea(
             }
             .pointerInput(Unit) {
                 surfaceSize?.let {
-                    getPointerInput(onPressed, onHold, onRelease, touchCoords, it)
+                    getPointerInput(viewModel::onPressed, viewModel::onHold, viewModel::onRelease, touchCoords, it)
                 }
             }
             .pointerInput(Unit) {
@@ -111,7 +111,7 @@ fun SplinterArea(
 @Preview
 @Composable
 fun SplinterAreaPreview() {
-    SplinterArea({}, { _, _ -> }, {})
+    SplinterArea()
 }
 
 data class TouchPoint(

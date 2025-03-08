@@ -19,7 +19,6 @@ package com.sintegra.splinter.ui
 import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,7 +26,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.sintegra.splinter.data.service.NativeAudioBridge
-import com.sintegra.splinter.ui.mainscreen.MainScreen
+import com.sintegra.splinter.ui.navigation.MainController
 import com.sintegra.splinter.ui.theme.SplinterTheme
 
 class MainActivity : ComponentActivity() {
@@ -46,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier,
                     color =  MaterialTheme.colors.background
                 ) {
-                    MainScreen()
+                    MainController()
                 }
             }
         }

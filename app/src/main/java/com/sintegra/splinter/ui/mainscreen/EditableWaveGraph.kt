@@ -36,14 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sintegra.splinter.core.ui.SplinterPointer
 import com.sintegra.splinter.model.WAVETABLE_SIZE
+import com.sintegra.splinter.ui.viewmodel.CustomWaveEditorViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 
 @Composable
 fun EditableWaveGraph(
-    onWaveSave: () -> Unit,
-    onSetCustomWave: (List<Float>) -> Unit,
-    onStartSound: () -> Unit = {},
-    onStopSound: () -> Unit = {},
+    viewModel: CustomWaveEditorViewModel = koinViewModel(),
+    onCloseGraphScreen: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var mSize: Size? by remember { mutableStateOf(null) }
@@ -61,7 +61,7 @@ fun EditableWaveGraph(
     }
 
     LaunchedEffect(anchorPoints) {
-        onSetCustomWave(
+        viewModel.onSetCustomWave(
             mSize?.let {
                 generatePoints(anchorPoints, it)
             } ?: List(WAVETABLE_SIZE) { 0f }
@@ -83,8 +83,8 @@ fun EditableWaveGraph(
                 .background(if (isSoundPlaying) Color.Red else Color.Green, RoundedCornerShape(4.dp))
                 .clickable {
                     when (isSoundPlaying) {
-                        false -> onStartSound()
-                        true -> onStopSound()
+                        false -> viewModel.onCustomWaveEditorStartSound()
+                        true -> viewModel.onCustomWaveEditorStopSound()
                     }
                     isSoundPlaying = !isSoundPlaying
                 },
@@ -156,12 +156,13 @@ fun EditableWaveGraph(
                 .size(200.dp, 50.dp)
                 .background(MaterialTheme.colors.primary, RoundedCornerShape(4.dp))
                 .clickable {
-                    onSetCustomWave(
+                    viewModel.onSetCustomWave(
                         mSize?.let {
                             generatePoints(anchorPoints, it)
                         } ?: List(WAVETABLE_SIZE) { 0f }
                     )
-                    onWaveSave()
+                    viewModel.onCustomWaveEditorStopSound()
+                    onCloseGraphScreen()
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -244,5 +245,5 @@ data class EditableTouchInput(
 @Preview
 @Composable
 fun EditableWaveGraphPreview(modifier: Modifier = Modifier) {
-    EditableWaveGraph({}, {}, {}, {}, Modifier)
+    EditableWaveGraph()
 }

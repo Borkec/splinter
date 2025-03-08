@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.serialization)
 }
 
 android {
     namespace = "com.sintegra.splinter"
     compileSdk = 34
-
-
 
     defaultConfig {
         applicationId = "com.sintegra.splinter"
@@ -72,7 +71,9 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.compose.ui)
     implementation(libs.compose.material)
+    implementation(libs.compose.navigation)
     implementation(libs.koin.android.compose)
+    implementation(libs.kotlinx.serialization)
 
     implementation(libs.oboe)
 
