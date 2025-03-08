@@ -10,6 +10,9 @@ object NativeAudioBridge {
     external fun startAudioStream(): Int
     external fun stopAudioStream(): Int
 
+    external fun playNote()
+    external fun releaseNote()
+
     external fun addAudioListener(audioFrameListener: AudioFrameListener)
     external fun removeAudioListener(audioFrameListener: AudioFrameListener)
 

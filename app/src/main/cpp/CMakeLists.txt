@@ -11,6 +11,8 @@ set(APP_SOURCES
         SplinterAudioStream.cpp
         bridge/SplinterJNI.cpp
         WaveGenerator.cpp
+        EnvelopeFilter.cpp
+        AudioProcessingUnit.cpp
         bridge/NativeCallback.cpp
         bridge/jni_utils.cpp
 )

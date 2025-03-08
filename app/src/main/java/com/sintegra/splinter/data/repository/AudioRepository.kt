@@ -1,7 +1,7 @@
 package com.sintegra.splinter.data.repository
 
-import android.util.Log
 import com.sintegra.splinter.data.service.AudioSource
+import com.sintegra.splinter.model.Envelope
 import com.sintegra.splinter.model.Modulation
 import com.sintegra.splinter.model.ModulationType
 import com.sintegra.splinter.model.WaveModel
@@ -22,11 +22,13 @@ interface AudioRepository {
     val audioBuffer: Flow<List<Float>>
     val currentCursorPosition: Flow<Int>
 
-    fun startAudioStream()
+    fun playNote()
 
-    fun stopAudioStream()
+    fun releaseNote()
 
     fun setSineFrequency(value: Float)
+
+    fun setEnvelopeFilter(envelope: Envelope)
 
     fun setModulation(value: Float, modulation: Modulation)
 
@@ -34,6 +36,10 @@ interface AudioRepository {
 }
 
 class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepository {
+
+    private var currentEnvelope: MutableStateFlow<Envelope> = MutableStateFlow(
+        value = Envelope(0.1f, 0.0f, 1.0f, 0.0f)
+    )
 
     private val _currentWave = MutableStateFlow(WaveModel(WaveType.SINE))
     override val currentWave: StateFlow<WaveModel> = _currentWave
@@ -57,12 +63,16 @@ class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepositor
         audioSource.cursorPosition
 
 
-    override fun startAudioStream() {
-        audioSource.startAudioStream()
+    override fun playNote() {
+        audioSource.playNote()
     }
 
-    override fun stopAudioStream() {
-        audioSource.stopAudioStream()
+    override fun releaseNote() {
+        audioSource.releaseNote()
+    }
+
+    override fun setEnvelopeFilter(envelope: Envelope) {
+        this.currentEnvelope.value = envelope
     }
 
     override fun setModulation(value: Float, modulation: Modulation) {

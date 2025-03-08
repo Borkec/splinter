@@ -82,6 +82,18 @@ JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
     return (jint) result1;
 }
 
+JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_playNote(
+        JNIEnv* env, jobject) {
+    __android_log_print(ANDROID_LOG_INFO, TAG, "%s", __func__);
+    sPlayer.getAudioProcessingUnit().playNote();
+}
+
+JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_releaseNote(
+        JNIEnv* env, jobject) {
+    __android_log_print(ANDROID_LOG_INFO, TAG, "%s", __func__);
+    sPlayer.getAudioProcessingUnit().releaseNote();
+}
+
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_addAudioListener(
         JNIEnv* env, jobject, jobject listener) {
     //env->NewGlobalRef(listener);
@@ -96,8 +108,9 @@ JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
     //env->NewGlobalRef(listener);
     __android_log_print(ANDROID_LOG_INFO, TAG, "Setting %s", __func__);
 
-    auto nativeCallback = new NativeCallback(listener, "onAudioCursorAvailable", "(I)V");
-    sPlayer.setCursorCallback(nativeCallback);
+    // not used right now
+    // auto nativeCallback = new NativeCallback(listener, "onAudioCursorAvailable", "(I)V");
+    // sPlayer.setCursorCallback(nativeCallback);
 }
 
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_setAudioBuffer(
@@ -132,7 +145,7 @@ JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_setFrequency(
         JNIEnv* env, jobject,jfloat freq
 ) {
-    sPlayer.setFrequency(freq);
+    sPlayer.getAudioProcessingUnit().setFrequency(freq);
 }
 
 #ifdef __cplusplus

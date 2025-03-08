@@ -21,14 +21,14 @@
 #include "jni.h"
 #include "WaveGenerator.h"
 #include "bridge/NativeCallback.h"
+#include "EnvelopeFilter.h"
+#include "AudioProcessingUnit.h"
 
 /**
  * Play white noise using Oboe.
  */
 class SplinterAudioStream {
 public:
-
-    SplinterAudioStream();
 
     /**
      * Open an Oboe stream.
@@ -46,31 +46,15 @@ public:
 
     void setGeneratorBuffer(const float* data);
 
-    void setCursorCallback(NativeCallback* callback);
-
-    void setFrequency(float f) const;
-
     int getWavetableSize() const;
 
     void setWavetableSize(int size);
 
+    AudioProcessingUnit& getAudioProcessingUnit() {
+        return *audioProcessingUnit;
+    }
+
 private:
-
-    class MyDataCallback : public oboe::AudioStreamDataCallback {
-    public:
-        float frequency = 420;
-
-        MyDataCallback(SplinterAudioStream *parent) : mParent(parent) {}
-
-        oboe::DataCallbackResult onAudioReady(
-                oboe::AudioStream *audioStream,
-                void *audioData,
-                int32_t numFrames) override;
-
-    private:
-        size_t currentIdx = 0;
-        SplinterAudioStream *mParent;
-    };
 
     class MyErrorCallback : public oboe::AudioStreamErrorCallback {
     public:
@@ -80,17 +64,13 @@ private:
     };
 
     std::shared_ptr<oboe::AudioStream> mStream;
-    std::shared_ptr<MyErrorCallback> mErrorCallback;
-    std::shared_ptr<WaveGenerator> waveGenerator;
 
-    NativeCallback* cursorCallback;
+    const std::shared_ptr<AudioProcessingUnit> audioProcessingUnit = std::make_shared<AudioProcessingUnit>(kChannelCount);;
+    std::shared_ptr<MyErrorCallback> mErrorCallback;
 
     static constexpr int kChannelCount = 2;
 
     int wavetableSize = TABLE_SIZE;
-public:
-
-    std::shared_ptr<MyDataCallback> mDataCallback;
 };
 
 #endif //SIMPLE_NOISE_MAKER_H

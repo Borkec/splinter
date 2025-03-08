@@ -65,7 +65,7 @@ fun SplinterArea(
             }
             .pointerInput(Unit) {
                 surfaceSize?.let {
-                    getPointerInput(touchCoords, onPressed, onHold, onRelease, it)
+                    getPointerInput(onPressed, onHold, onRelease, touchCoords, it)
                 }
             }
             .pointerInput(Unit) {

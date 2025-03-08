@@ -5,6 +5,11 @@
 #include <android/log.h>
 #include "WaveGenerator.h"
 
+WaveGenerator::WaveGenerator() {
+    mTableSize = TABLE_SIZE;
+    m_data = new float[mTableSize];
+    std::fill(m_data, m_data + mTableSize, 0.0f);
+}
 
 WaveGenerator::WaveGenerator(size_t tableSize) {
     mTableSize = tableSize;

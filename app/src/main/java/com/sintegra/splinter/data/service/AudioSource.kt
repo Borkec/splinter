@@ -15,6 +15,10 @@ interface AudioSource {
 
     fun stopAudioStream()
 
+    fun playNote()
+
+    fun releaseNote()
+
     fun setSineFrequency(frequency: Float)
 
     fun setAudioBuffer(buffer: FloatArray)
@@ -46,6 +50,14 @@ class AudioSourceImpl: AudioSource {
 
         NativeAudioBridge.addAudioCursorListener(listener)
         awaitClose()
+    }
+
+    override fun playNote() {
+        NativeAudioBridge.playNote()
+    }
+
+    override fun releaseNote() {
+        NativeAudioBridge.releaseNote()
     }
 
     override fun startAudioStream() {

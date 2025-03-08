@@ -23,27 +23,21 @@ static const char *TAG = "SineAudioStream";
 #include <SplinterAudioStream.h>
 #include "bridge/NativeCallback.h"
 #include "bridge/jni_utils.h"
+#include "AudioProcessingUnit.h"
 
 using namespace oboe;
-
-SplinterAudioStream::SplinterAudioStream() {
-
-    waveGenerator = std::make_shared<WaveGenerator>(wavetableSize);
-}
 
 oboe::Result SplinterAudioStream::open() {
 
     AudioStreamBuilder builder = AudioStreamBuilder();
 
-    // Use shared_ptr to prevent use of a deleted callback.
-    mDataCallback = std::make_shared<MyDataCallback>(this);
     mErrorCallback = std::make_shared<MyErrorCallback>();
 
     oboe::Result result = builder.setSharingMode(oboe::SharingMode::Exclusive)
             ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
             ->setFormat(oboe::AudioFormat::Float)
             ->setChannelCount(kChannelCount)
-            ->setDataCallback(mDataCallback)
+            ->setDataCallback(audioProcessingUnit)
             ->setErrorCallback(mErrorCallback)
             ->openStream(mStream);
 
@@ -63,57 +57,12 @@ oboe::Result SplinterAudioStream::close() {
     return mStream->close();
 }
 
-void SplinterAudioStream::setFrequency(float f) const {
-    mDataCallback->frequency = f;
-}
-
 int SplinterAudioStream::getWavetableSize() const {
     return wavetableSize;
 }
 
 void SplinterAudioStream::setWavetableSize(int size) {
-    waveGenerator = std::make_shared<WaveGenerator>(size);
     wavetableSize = size;
-}
-
-void SplinterAudioStream::setCursorCallback(NativeCallback *callback) {
-    cursorCallback = callback;
-}
-
-/**
- * This callback method will be called from a high priority audio thread.
- * It should only do math and not do any blocking operations like
- * reading or writing files, memory allocation, or networking.
- * @param audioStream
- * @param audioData pointer to an array of samples to be filled
- * @param numFrames number of frames needed
- * @return
- */
-DataCallbackResult SplinterAudioStream::MyDataCallback::onAudioReady(
-        AudioStream *audioStream,
-        void *audioData,
-        int32_t numFrames) {
-
-    auto wave = mParent->waveGenerator->getData();
-    size_t waveSize = mParent->wavetableSize;
-    // We requested float when we built the stream.
-    auto output = (float *) audioData;
-    int sr = audioStream->getSampleRate();
-    int phaseIncrement = frequency * waveSize / sr;
-
-    for (int i = 0; i < numFrames; i++) {
-        for (int j = 0; j < kChannelCount; j++) {
-            *output++ = *(wave + currentIdx);
-        }
-
-        if (mParent->cursorCallback != nullptr) {
-            mParent->cursorCallback->call((int) currentIdx);
-        }
-
-        currentIdx = (currentIdx + phaseIncrement) % waveSize;
-    }
-
-    return oboe::DataCallbackResult::Continue;
 }
 
 void SplinterAudioStream::MyErrorCallback::onErrorAfterClose(oboe::AudioStream *oboeStream,
@@ -133,9 +82,9 @@ void SplinterAudioStream::addWaveGeneratorCallback(NativeCallback *callback) {
         callback->call(data, size);
     };
 
-    waveGenerator->addOnDataChangedListener(listener);
+    audioProcessingUnit->getWaveGenerator().addOnDataChangedListener(listener);
 }
 
 void SplinterAudioStream::setGeneratorBuffer(const float *data) {
-    waveGenerator->fill(data);
+    audioProcessingUnit->getWaveGenerator().fill(data);
 }

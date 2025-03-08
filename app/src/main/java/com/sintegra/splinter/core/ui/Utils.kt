@@ -18,7 +18,7 @@ fun DrawScope.SplinterPointer(midPoint: Offset, showRing: Boolean = true, color:
         center = midPoint
     )
 
-    if(showRing) {
+    if (showRing) {
         drawCircle(
             color = color,
             style = Stroke(5f),
@@ -29,11 +29,11 @@ fun DrawScope.SplinterPointer(midPoint: Offset, showRing: Boolean = true, color:
 }
 
 suspend fun PointerInputScope.getPointerInput(
-    touchCoords: MutableState<Offset?>,
-    onPressed: () -> Unit,
-    onHold: (Float, Float) -> Unit,
-    onRelease: () -> Unit,
-    size: Size
+    onPressed: () -> Unit = {},
+    onHold: (Float, Float) -> Unit = { _, _ -> },
+    onRelease: () -> Unit = {},
+    touchCoords: MutableState<Offset?>? = null,
+    size: Size? = null
 ) {
     awaitPointerEventScope {
         while (true) {
@@ -45,13 +45,15 @@ suspend fun PointerInputScope.getPointerInput(
 
                 PointerEventType.Release -> {
                     onRelease()
-                    touchCoords.value = null
+                    touchCoords?.value = null
                 }
             }
             val position = event.changes.first().position
 
-            touchCoords.value = position
-            onHold(position.x / size.width, position.y / size.width)
+            touchCoords?.value = position
+            if (size != null) {
+                onHold(position.x / size.width, position.y / size.width)
+            }
         }
     }
 }

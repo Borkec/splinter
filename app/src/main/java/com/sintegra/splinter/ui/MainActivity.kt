@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         NativeAudioBridge.openAudioStream()
+        NativeAudioBridge.startAudioStream()
         setDefaultStreamValues()
 
 
@@ -53,11 +54,18 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        NativeAudioBridge.startAudioStream()
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+    }
+
+    override fun onStop() {
+        super.onStop()
+        NativeAudioBridge.stopAudioStream()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        NativeAudioBridge.stopAudioStream()
         NativeAudioBridge.closeAudioStream()
     }
 

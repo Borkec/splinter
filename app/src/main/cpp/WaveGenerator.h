@@ -6,15 +6,25 @@
 #include <functional>
 #include "const.h"
 
+
+#ifndef SPLINTER_WAVEGENERATOR_H
+#define SPLINTER_WAVEGENERATOR_H
+
 class WaveGenerator {
 
 public:
+
+    WaveGenerator();
 
     WaveGenerator(size_t tableSize);
 
     void fill(const float* data);
 
-    const float* getData() const;
+    [[nodiscard]] const float* getData() const;
+
+    [[nodiscard]] size_t getTableSize() const {
+        return mTableSize;
+    };
 
     void addOnDataChangedListener(const std::function<void(const float*, const size_t)>& listener);
     void removeOnDataChangedListener();
@@ -27,3 +37,5 @@ private:
 
     std::vector<std::function<void(const float*, const size_t)>> onDataChangedListeners;
 };
+
+#endif

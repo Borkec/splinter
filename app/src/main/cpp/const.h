@@ -2,6 +2,6 @@
 #define SPLINTER_CONST_H
 
 // Default table size for this library. JNI initialization will swap this for table size defined in common.
-const int TABLE_SIZE = 2048;
+const int TABLE_SIZE = 4096;
 
 #endif //SPLINTER_CONST_H

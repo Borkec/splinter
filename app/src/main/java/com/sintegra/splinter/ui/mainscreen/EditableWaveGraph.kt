@@ -83,8 +83,8 @@ fun EditableWaveGraph(
                 .background(if (isSoundPlaying) Color.Red else Color.Green, RoundedCornerShape(4.dp))
                 .clickable {
                     when (isSoundPlaying) {
-                        false -> onStopSound()
-                        true -> onStartSound()
+                        false -> onStartSound()
+                        true -> onStopSound()
                     }
                     isSoundPlaying = !isSoundPlaying
                 },

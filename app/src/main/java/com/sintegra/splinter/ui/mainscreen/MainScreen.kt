@@ -1,11 +1,23 @@
 package com.sintegra.splinter.ui.mainscreen
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.sintegra.splinter.model.KeyType
 import com.sintegra.splinter.model.WaveType
 import com.sintegra.splinter.ui.theme.SplinterTheme
 import com.sintegra.splinter.ui.viewmodel.CurrentScreen
@@ -25,12 +37,14 @@ fun MainScreen(viewModel: MainViewModel = koinViewModel()) {
         onPressed = viewModel::onPressed,
         onHold = viewModel::onHold,
         onRelease = viewModel::onRelease,
+        onPressedKey = viewModel::onPlayKey,
+        onReleasedKey = viewModel::onReleaseKey,
         onWavePicked = viewModel::onWaveTypeSelected,
-        onCustomWaveClicked = viewModel::onCustomWavePicked,
+        onCustomWaveClicked = viewModel::openCustomWavePickerScreen,
         onSetCustomWave = viewModel::onSetCustomWave,
         onCustomWaveEditorStartSound = viewModel::onCustomWaveEditorStartSound,
         onCustomWaveEditorStopSound = viewModel::onCustomWaveEditorStopSound,
-        onWaveSave = viewModel::closeCustomScreen
+        onWaveSave = viewModel::closeCustomWavePickerScreen
     )
 }
 
@@ -41,6 +55,8 @@ fun MainScreenContent(
     onPressed: () -> Unit = {},
     onHold: (Float, Float) -> Unit = { _, _ -> },
     onRelease: () -> Unit = {},
+    onPressedKey: (KeyType) -> Unit = {},
+    onReleasedKey: () -> Unit = {},
     onWavePicked: (WaveType) -> Unit,
     onCustomWaveClicked: () -> Unit,
     onSetCustomWave: (List<Float>) -> Unit,
@@ -49,19 +65,53 @@ fun MainScreenContent(
     onWaveSave: () -> Unit
 ) {
 
-    Box(
+    var isKeys by remember { mutableStateOf(false) }
+
+    Column(
         modifier = Modifier
     ) {
         when (screenViewState.screen) {
             CurrentScreen.MAIN -> {
-                SplinterArea(
-                    onPressed,
-                    onHold,
-                    onRelease,
-                    Modifier
-                )
 
-                WavePicker(selectedWave, onWavePicked, onCustomWaveClicked)
+                Row(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(bottom = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Switch(
+                        modifier = Modifier.rotate(90f),
+                        checked = isKeys,
+                        onCheckedChange = {
+                            isKeys = !isKeys
+                        }
+                    )
+
+                    WavePicker(
+                        selectedWave = selectedWave,
+                        onWavePicked = onWavePicked,
+                        onCustomWaveClicked = onCustomWaveClicked,
+                    )
+                }
+
+
+                when (isKeys) {
+                    false ->
+                        SplinterArea(
+                            onPressed,
+                            onHold,
+                            onRelease,
+                            Modifier
+                        )
+
+                    true ->
+                        Octave(
+                            Modifier.fillMaxSize(),
+                            onPressedKey,
+                            onReleasedKey
+                        )
+
+                }
             }
 
             CurrentScreen.CUSTOM_PICKER -> {
@@ -72,7 +122,7 @@ fun MainScreenContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0)
 @Composable
 fun DefaultPreview() {
     SplinterTheme {
@@ -81,6 +131,8 @@ fun DefaultPreview() {
             MainViewSate.ScreenViewState(CurrentScreen.MAIN),
             {},
             { _, _ -> },
+            {},
+            { _ -> },
             {},
             {},
             {},

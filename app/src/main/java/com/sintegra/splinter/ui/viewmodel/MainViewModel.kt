@@ -1,12 +1,16 @@
 package com.sintegra.splinter.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sintegra.splinter.data.repository.AudioRepository
+import com.sintegra.splinter.model.KeyColor
+import com.sintegra.splinter.model.KeyType
 import com.sintegra.splinter.model.Modulation
 import com.sintegra.splinter.model.ModulationType
 import com.sintegra.splinter.model.WaveModel
 import com.sintegra.splinter.model.WaveType
+import com.sintegra.splinter.model.getFrequency
 import com.sintegra.splinter.ui.viewmodel.MainViewSate.SelectedWave.Companion.fromWaveModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,7 +31,7 @@ class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() 
     val screenViewState: StateFlow<MainViewSate.ScreenViewState> = _screenViewState
 
     fun onPressed() {
-        audioRepository.startAudioStream()
+        audioRepository.playNote()
     }
 
     fun onHold(x: Float, y: Float) {
@@ -35,33 +39,44 @@ class MainViewModel(private val audioRepository: AudioRepository) : ViewModel() 
     }
 
     fun onRelease() {
-        audioRepository.stopAudioStream()
+        audioRepository.releaseNote()
     }
 
     fun onWaveTypeSelected(waveType: WaveType) {
         audioRepository.setWaveType(waveType)
     }
 
-    fun onCustomWavePicked() {
+    fun openCustomWavePickerScreen() {
         _screenViewState.value = MainViewSate.ScreenViewState(CurrentScreen.CUSTOM_PICKER)
     }
 
     fun onSetCustomWave(customWave: List<Float>) {
         audioRepository.setWaveType(WaveType.CUSTOM, customWave)
-        audioRepository.stopAudioStream()
     }
 
-    fun closeCustomScreen() {
+    fun onPlayKey(keyType: KeyType) {
+
+        Log.d("pressed", "${keyType} ${keyType.getFrequency()}")
+        audioRepository.setSineFrequency(keyType.getFrequency())
+        audioRepository.playNote()
+    }
+
+    fun onReleaseKey() {
+        audioRepository.releaseNote()
+    }
+
+    fun closeCustomWavePickerScreen() {
+        audioRepository.releaseNote()
         _screenViewState.value = MainViewSate.ScreenViewState(CurrentScreen.MAIN)
     }
 
     fun onCustomWaveEditorStopSound() {
-        audioRepository.setSineFrequency(420f)
-        audioRepository.startAudioStream()
+        audioRepository.releaseNote()
     }
 
     fun onCustomWaveEditorStartSound() {
-        audioRepository.stopAudioStream()
+        audioRepository.setSineFrequency(420f)
+        audioRepository.playNote()
     }
 }
 
@@ -78,6 +93,9 @@ sealed class MainViewSate {
 
     data class ScreenViewState(val screen: CurrentScreen)
 }
+
+data class KeyViewState(val type: KeyType, val color: KeyColor, val relativeY: Float)
+
 enum class CurrentScreen {
     MAIN, CUSTOM_PICKER
 }
