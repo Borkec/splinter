@@ -29,46 +29,23 @@ fun DrawScope.SplinterPointer(midPoint: Offset, showRing: Boolean = true, color:
 }
 
 suspend fun PointerInputScope.getPointerInput(
-    onPressed: () -> Unit = {},
-    onHold: (Float, Float) -> Unit = { _, _ -> },
-    onRelease: () -> Unit = {},
-    touchCoords: MutableState<Offset?>? = null,
-    size: Size? = null
+    onHold: (Int, Float, Float) -> Unit = { _,  _, _ -> },
+    onRelease: (Int) -> Unit = {}
 ) {
     awaitPointerEventScope {
         while (true) {
             val event = awaitPointerEvent()
-            when (event.type) {
-                PointerEventType.Press -> {
-                    onPressed()
-                }
 
-                PointerEventType.Release -> {
-                    onRelease()
-                    touchCoords?.value = null
-                }
-            }
-            val position = event.changes.first().position
+            for(event in event.changes) {
+                val position = event.position
+                val pointerId = event.id.value.toInt()
 
-            touchCoords?.value = position
-            if (size != null) {
-                onHold(position.x / size.width, position.y / size.width)
+                if(event.pressed) {
+                    onHold(pointerId, position.x, position.y)
+                } else {
+                    onRelease(pointerId)
+                }
             }
         }
     }
-}
-
-suspend fun PointerInputScope.getDragInput(
-    points: MutableState<List<TouchPoint>>,
-) {
-    detectDragGestures(
-        onDragStart = { offset ->
-            val currentTime = System.currentTimeMillis()
-            points.value += TouchPoint(position = offset, timestamp = currentTime)
-        },
-        onDrag = { change, _ ->
-            val currentTime = System.currentTimeMillis()
-            points.value += TouchPoint(position = change.position, timestamp = currentTime)
-        }
-    )
 }

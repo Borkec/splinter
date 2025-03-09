@@ -1,7 +1,7 @@
 package com.sintegra.splinter.model
 
 
-data class Key(val type: KeyType)
+data class Key(val type: KeyType, val octave: Int = 1)
 
 enum class KeyColor {
     White, Black
@@ -10,7 +10,7 @@ enum class KeyColor {
 enum class KeyType {
     C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B;
 
-    fun getFrequency(): Float {
+    fun getBaseFrequency(): Float {
         return when (this) {
             C -> 261.63f
             CSharp -> 277.18f

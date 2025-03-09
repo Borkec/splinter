@@ -1,6 +1,7 @@
 package com.sintegra.splinter.data.service
 
 import com.sintegra.splinter.data.service.NativeAudioBridge.removeAudioListener
+import com.sintegra.splinter.model.SoundInput
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -19,7 +20,11 @@ interface AudioSource {
 
     fun releaseNote()
 
-    fun setSineFrequency(frequency: Float)
+    fun addSoundInput(soundInput: SoundInput)
+
+    fun changeSoundInputFrequency(soundInput: SoundInput, newFrequency: Float)
+
+    fun removeSoundInput(soundInputId: Int)
 
     fun setAudioBuffer(buffer: FloatArray)
 
@@ -68,8 +73,16 @@ class AudioSourceImpl: AudioSource {
         NativeAudioBridge.stopAudioStream()
     }
 
-    override fun setSineFrequency(frequency: Float) {
-        NativeAudioBridge.setFrequency(frequency)
+    override fun addSoundInput(soundInput: SoundInput) {
+        NativeAudioBridge.addSoundInput(soundInput.id, soundInput.frequency)
+    }
+
+    override fun changeSoundInputFrequency(soundInput: SoundInput, newFrequency: Float) {
+        NativeAudioBridge.changeSoundInputFrequency(soundInput.id, newFrequency)
+    }
+
+    override fun removeSoundInput(soundInputId: Int) {
+        NativeAudioBridge.removeSoundInput(soundInputId)
     }
 
     override fun setAudioBuffer(buffer: FloatArray) {

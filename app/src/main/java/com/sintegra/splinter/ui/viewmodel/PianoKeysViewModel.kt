@@ -6,17 +6,25 @@ import com.sintegra.splinter.model.Key
 import com.sintegra.splinter.model.KeyColor
 import com.sintegra.splinter.model.KeyType
 import com.sintegra.splinter.model.Octave
+import com.sintegra.splinter.model.SoundInput
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.pow
 
 class PianoKeysViewModel(private val audioRepository: AudioRepository) : ViewModel() {
 
-    fun onPlayKey(keyType: KeyType, octaveLevel: Int) {
-        audioRepository.setSineFrequency(keyType.getFrequency() * 2f.pow(octaveLevel - 1))
-        audioRepository.playNote()
+    private val _pressedKeysState = MutableStateFlow(mapOf<Int, Key>())
+    val pressedKeysState: StateFlow<Map<Int, Key>> = _pressedKeysState
+
+    fun onPlayKey(inputId: Int, keyType: KeyType, octaveLevel: Int) {
+        audioRepository.addSoundInput(SoundInput(id = inputId, frequency = keyType.getBaseFrequency() * 2f.pow(octaveLevel - 1)))
+        _pressedKeysState.value += inputId to Key(keyType, octaveLevel)
     }
 
-    fun onReleaseKey() {
-        audioRepository.releaseNote()
+    fun onReleaseKey(inputId: Int) {
+
+        audioRepository.removeSoundInput(inputId)
+        _pressedKeysState.value -= inputId
     }
 }
 

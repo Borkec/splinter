@@ -18,15 +18,28 @@ public:
 
     ~AudioProcessingUnit();
 
-    void setFrequency(float f) {
-        frequency = f;
+    void addSoundInput(int id, float f) {
+        auto found = soundInputs.find(id);
+        if(found == soundInputs.end()) {
+            soundInputs[id] = SoundInput(id, f);
+        } else {
+            soundInputs[id].frequency = f;
+        }
+    };
+
+    void changeSoundInputFrequency(int id, float f) {
+        soundInputs[id].frequency = f;
+    }
+
+    void removeSoundInput(int id) {
+        soundInputs.erase(id);
     };
 
     void playNote();
 
     void releaseNote();
 
-    WaveGenerator& getWaveGenerator() {
+    WaveGenerator &getWaveGenerator() {
         return *waveGenerator;
     }
 
@@ -37,17 +50,29 @@ public:
 
 private:
 
-    void resetTime();
+    struct SoundInput {
+        int id;
+        float frequency;
+        int currentIdx = 0;
+        int phaseIncrement = 0;
 
-    size_t currentIdx;
+        SoundInput() : id(0), frequency(0) {}
+
+        SoundInput(int _id, float _freq) : id(_id), frequency(_freq) {}
+
+        void updatePhase(int waveSize, int sampleRate) {
+            phaseIncrement = frequency * waveSize / sampleRate;
+            currentIdx = (currentIdx + phaseIncrement) % waveSize;
+        }
+    };
+
     int framesProcessed;
     float playTime;
-    bool isPlaying;
     int channelCount;
-    float frequency;
+    std::unordered_map<int, SoundInput> soundInputs;
 
     std::shared_ptr<WaveGenerator> waveGenerator;
-    EnvelopeFilter* envelopeFilter;
+    EnvelopeFilter *envelopeFilter;
 
     enum PlayState {
         ATTACK,

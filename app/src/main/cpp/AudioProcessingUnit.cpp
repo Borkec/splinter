@@ -10,8 +10,6 @@
 
 
 AudioProcessingUnit::AudioProcessingUnit(int channelCount) {
-    isPlaying = false;
-    currentIdx = 0;
     framesProcessed = 0;
     playTime = 0;
     this->channelCount = channelCount;
@@ -22,8 +20,6 @@ AudioProcessingUnit::AudioProcessingUnit(int channelCount) {
 
 
 AudioProcessingUnit::AudioProcessingUnit(int channelCount, size_t tableSize) {
-    isPlaying = false;
-    currentIdx = 0;
     framesProcessed = 0;
     playTime = 0;
     this->channelCount = channelCount;
@@ -35,6 +31,7 @@ AudioProcessingUnit::AudioProcessingUnit(int channelCount, size_t tableSize) {
 AudioProcessingUnit::~AudioProcessingUnit() {
     delete envelopeFilter;
 }
+
 /**
 * This callback method will be called from a high priority audio thread.
 * It should only do math and not do any blocking operations like
@@ -55,49 +52,40 @@ oboe::DataCallbackResult AudioProcessingUnit::onAudioReady(
     // We requested float when we built the stream.
     auto output = (float *) audioData;
 
-    if(!isPlaying) {
-        std::fill( output, output + numFrames*channelCount, 0);
+    std::fill(output, output + numFrames * channelCount, 0);
+
+    if (soundInputs.empty()) {
         return oboe::DataCallbackResult::Continue;
     }
 
     int sampleRate = audioStream->getSampleRate();
-    int phaseIncrement = frequency * waveSize / sampleRate;
 
     for (int i = 0; i < numFrames; i++) {
-        float envelopeCoef = 1.; // envelopeFilter->getEnvelopeForCurrentTime();
 
         for (int j = 0; j < channelCount; j++) {
-            *output++ = *(wave + currentIdx)  * envelopeCoef;
+            for (auto &[id, soundInput]: soundInputs) {
+                *output += *(wave + soundInput.currentIdx) * 1.0f/(soundInputs.size()*2.0f);
+            }
+            output++;
         }
 
         framesProcessed++;
-        playTime = (float)framesProcessed / sampleRate;
+        playTime = (float) framesProcessed / sampleRate;
         envelopeFilter->updateCurrentTime(playTime);
-
-        currentIdx = (currentIdx + phaseIncrement) % waveSize;
+        for (auto &[id, soundInput]: soundInputs) {
+            soundInput.updatePhase(waveSize, sampleRate);
+        }
     }
-
-//    __android_log_print(ANDROID_LOG_INFO, "TAG",
-//                        "PlayTime: %f",
-//                        playTime
-//    );
-
+    LOG_I(soundInputs.size());
     return oboe::DataCallbackResult::Continue;
 }
 
 void AudioProcessingUnit::playNote() {
-    isPlaying = true;
     envelopeFilter->startAttack(playTime);
 }
 
 void AudioProcessingUnit::releaseNote() {
-    isPlaying = false;
     envelopeFilter->startRelease(playTime);
-}
-
-void AudioProcessingUnit::resetTime() {
-    framesProcessed = 0;
-    playTime = 0;
 }
 
 

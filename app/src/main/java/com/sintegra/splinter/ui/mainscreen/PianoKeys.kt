@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,19 +21,17 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.zIndex
 import com.sintegra.splinter.core.ui.toDp
+import com.sintegra.splinter.model.Key
 import com.sintegra.splinter.model.KeyColor
 import com.sintegra.splinter.model.KeyType
 import com.sintegra.splinter.ui.viewmodel.KeyViewState
@@ -44,15 +43,15 @@ private const val WHITE_KEYS = 7;
 
 @Composable
 fun Piano(
-    numOfOctaves: Int = 1,
+    numOfOctaves: Int = 2,
     viewModel: PianoKeysViewModel = koinViewModel(),
     modifier: Modifier = Modifier,
 ) {
+    val pressedKeys by viewModel.pressedKeysState.collectAsState()
 
     var mSize by remember { mutableStateOf(IntSize.Zero) }
     var size by remember { mutableStateOf(Size(0f, 0f)) }
     val keyHeight = remember(size) { size.height / WHITE_KEYS }
-    var pressedKey by remember { mutableStateOf<Pair<KeyType, Int>?>(null) }
 
     var positionMap by remember { mutableStateOf(mapOf<Offset, Pair<KeyType, Int>>()) }
     var sizeMap by remember { mutableStateOf(mapOf<Offset, Size>()) }
@@ -65,22 +64,27 @@ fun Piano(
 
                     while (true) {
                         val event = awaitPointerEvent()
-                        val position = event.changes.first().position
-                        if (event.type == PointerEventType.Release) {
-                            viewModel.onReleaseKey()
-                            pressedKey = null
-                            continue
-                        }
+                        for(change in event.changes) {
 
-                        // look up if this is possible to do without for loop
-                        for (pos in positionMap.keys) {
-                            val key = positionMap[pos]!!
-                            val sz = sizeMap[pos]!!
+                            var inputFound = false
 
-                            if (sz.toRect().translate(pos).contains(position)) {
-                                viewModel.onPlayKey(key.first, key.second)
-                                pressedKey = key
-                                break
+                            // look up if this is possible to find without a loop
+                            for (pos in positionMap.keys) {
+                                val key = positionMap[pos]!!
+                                val sz = sizeMap[pos]!!
+
+                                if (sz.toRect().translate(pos).contains(change.position)) {
+                                    inputFound = true
+                                    if (!change.pressed) {
+                                        viewModel.onReleaseKey(change.id.value.toInt())
+                                    } else {
+                                        viewModel.onPlayKey(change.id.value.toInt(), key.first, key.second)
+                                    }
+                                    break
+                                }
+                            }
+                            if(!inputFound) {
+                                viewModel.onReleaseKey(change.id.value.toInt())
                             }
                         }
                     }
@@ -97,9 +101,10 @@ fun Piano(
             ) {
                 for (viewState in OctaveViewState) {
                     val keyDrawData = viewState.getKeyDrawData(
-                        keyPressed = viewState.type == pressedKey?.first && octave == pressedKey?.second,
+                        keyPressed = pressedKeys.containsValue(Key(viewState.type, octave)),
                         keyHeight = keyHeight,
-                        size = size)
+                        size = size
+                    )
 
                     Surface(
                         color = keyDrawData.color,
@@ -111,16 +116,17 @@ fun Piano(
                             )
                             .height(keyDrawData.height.toDp())
                             .width(keyDrawData.width.toDp())
-                            .padding(
-                                vertical = 4.dp
-                            )
                             .onGloballyPositioned {
 
                                 val posInGp = it.parentLayoutCoordinates?.positionInParent() ?: Offset.Zero
 
                                 positionMap += (posInGp + it.positionInParent()) to Pair(viewState.type, octave)
                                 sizeMap += (posInGp + it.positionInParent()) to it.size.toSize()
+
                             }
+                            .padding(
+                                vertical = 4.dp
+                            )
                             .zIndex(keyDrawData.zIndex)
                     ) {}
                 }
@@ -152,10 +158,10 @@ private fun KeyViewState.getKeyDrawData(keyPressed: Boolean, keyHeight: Float, s
 
         KeyColor.Black -> KeyDrawData(
             color = if (keyPressed) Color.LightGray else Color.Black,
-            offsetY = (relativeY * size.height + keyHeight / 6).toInt(),
+            offsetY = (relativeY * size.height + keyHeight / 9).toInt(),
             offsetX = (size.width / 2).toInt(),
             width = (size.width / 2).toInt(),
-            height = (keyHeight / 1.5).toInt(),
+            height = (keyHeight / 1.2).toInt(),
             zIndex = 1f
         )
     }

@@ -4,6 +4,7 @@ import com.sintegra.splinter.data.service.AudioSource
 import com.sintegra.splinter.model.Envelope
 import com.sintegra.splinter.model.Modulation
 import com.sintegra.splinter.model.ModulationType
+import com.sintegra.splinter.model.SoundInput
 import com.sintegra.splinter.model.WaveModel
 import com.sintegra.splinter.model.WaveType
 import com.sintegra.splinter.model.interpolateValue
@@ -19,6 +20,8 @@ interface AudioRepository {
 
     val currentWave: StateFlow<WaveModel>
 
+    val currentSoundInputs: StateFlow<List<SoundInput>>
+
     val audioBuffer: Flow<List<Float>>
     val currentCursorPosition: Flow<Int>
 
@@ -26,7 +29,11 @@ interface AudioRepository {
 
     fun releaseNote()
 
-    fun setSineFrequency(value: Float)
+    fun addSoundInput(soundInput: SoundInput)
+
+    fun changeSoundInputFrequency(soundInput: SoundInput, frequency: Float)
+
+    fun removeSoundInput(soundInputId: Int)
 
     fun setEnvelopeFilter(envelope: Envelope)
 
@@ -43,6 +50,9 @@ class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepositor
 
     private val _currentWave = MutableStateFlow(WaveModel(WaveType.SINE))
     override val currentWave: StateFlow<WaveModel> = _currentWave
+
+    private val _currentSoundInputs = MutableStateFlow(listOf<SoundInput>())
+    override val currentSoundInputs: StateFlow<List<SoundInput>> = _currentSoundInputs
 
     private val audioCoroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -78,13 +88,21 @@ class AudioRepositoryImpl(private val audioSource: AudioSource) : AudioRepositor
     override fun setModulation(value: Float, modulation: Modulation) {
         when(modulation.type) {
             ModulationType.FREQUENCY -> {
-                audioSource.setSineFrequency(modulation.interpolateValue(value))
+                audioSource.addSoundInput(SoundInput(frequency = modulation.interpolateValue(value)))
             }
         }
     }
 
-    override fun setSineFrequency(frequency: Float) {
-        audioSource.setSineFrequency(frequency)
+    override fun addSoundInput(soundInput: SoundInput) {
+        audioSource.addSoundInput(soundInput)
+    }
+
+    override fun removeSoundInput(soundInputId: Int) {
+        audioSource.removeSoundInput(soundInputId)
+    }
+
+    override fun changeSoundInputFrequency(soundInput: SoundInput, frequency: Float) {
+        audioSource.changeSoundInputFrequency(soundInput, frequency)
     }
 
     override fun setWaveType(waveType: WaveType, customWave: List<Float>?) {

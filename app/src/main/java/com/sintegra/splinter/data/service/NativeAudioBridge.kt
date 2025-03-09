@@ -19,6 +19,9 @@ object NativeAudioBridge {
     external fun addAudioCursorListener(audioFrameListener: AudioCursorListener)
 
     external fun setDefaultStreamValues(sampleRate: Int, framesPerBurst: Int)
-    external fun setFrequency(frequency: Float)
     external fun setAudioBuffer(buffer: FloatArray)
+
+    external fun addSoundInput(id: Int, frequency: Float)
+    external fun changeSoundInputFrequency(id: Int, frequency: Float)
+    external fun removeSoundInput(id: Int)
 }

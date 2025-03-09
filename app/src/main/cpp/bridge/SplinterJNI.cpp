@@ -42,7 +42,7 @@ static SplinterAudioStream sPlayer;
  * Native (JNI) implementation of AudioPlayer.startAudiostreamNative()
  */
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_initializeBridge(
-        JNIEnv* env, jobject, jint wavetableSize) {
+        JNIEnv *env, jobject, jint wavetableSize) {
     // Save javaVM globally
     env->GetJavaVM(&javaVM);
     sPlayer.setWavetableSize(wavetableSize);
@@ -50,7 +50,7 @@ JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
 }
 
 JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_openAudioStream(
-        JNIEnv* env, jobject) {
+        JNIEnv *env, jobject) {
     __android_log_print(ANDROID_LOG_INFO, TAG, "%s", __func__);
 
     auto result = sPlayer.open();
@@ -58,7 +58,7 @@ JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
 }
 
 JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_closeAudioStream(
-        JNIEnv* env, jobject) {
+        JNIEnv *env, jobject) {
     __android_log_print(ANDROID_LOG_INFO, TAG, "%s", __func__);
 
     auto result = sPlayer.close();
@@ -66,7 +66,7 @@ JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
 }
 
 JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_startAudioStream(
-        JNIEnv* env, jobject) {
+        JNIEnv *env, jobject) {
     __android_log_print(ANDROID_LOG_INFO, TAG, "%s", __func__);
 
     auto result = sPlayer.start();
@@ -83,19 +83,19 @@ JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
 }
 
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_playNote(
-        JNIEnv* env, jobject) {
+        JNIEnv *env, jobject) {
     __android_log_print(ANDROID_LOG_INFO, TAG, "%s", __func__);
     sPlayer.getAudioProcessingUnit().playNote();
 }
 
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_releaseNote(
-        JNIEnv* env, jobject) {
+        JNIEnv *env, jobject) {
     __android_log_print(ANDROID_LOG_INFO, TAG, "%s", __func__);
     sPlayer.getAudioProcessingUnit().releaseNote();
 }
 
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_addAudioListener(
-        JNIEnv* env, jobject, jobject listener) {
+        JNIEnv *env, jobject, jobject listener) {
     //env->NewGlobalRef(listener);
     __android_log_print(ANDROID_LOG_INFO, TAG, "Setting %s", __func__);
 
@@ -104,7 +104,7 @@ JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
 }
 
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_addAudioCursorListener(
-        JNIEnv* env, jobject, jobject listener) {
+        JNIEnv *env, jobject, jobject listener) {
     //env->NewGlobalRef(listener);
     __android_log_print(ANDROID_LOG_INFO, TAG, "Setting %s", __func__);
 
@@ -114,38 +114,50 @@ JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge
 }
 
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_setAudioBuffer(
-        JNIEnv* env, jobject, jfloatArray array) {
+        JNIEnv *env, jobject, jfloatArray array) {
     //env->NewGlobalRef(listener);
     __android_log_print(ANDROID_LOG_INFO, TAG, "Setting %s", __func__);
-    float* buf = env->GetFloatArrayElements(array, nullptr);
+    float *buf = env->GetFloatArrayElements(array, nullptr);
     sPlayer.setGeneratorBuffer(buf);
 }
 
 JNIEXPORT jint JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_getTableSize(
-        JNIEnv* env, jobject) {
-    return (jint)sPlayer.getWavetableSize();
+        JNIEnv *env, jobject) {
+    return (jint) sPlayer.getWavetableSize();
 }
 
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_removeAudioListener(
-        JNIEnv* env, jobject, jobject listener) {
+        JNIEnv *env, jobject, jobject listener) {
     __android_log_print(ANDROID_LOG_INFO, TAG, "Setting %s", __func__);
     env->DeleteGlobalRef(listener);
 }
 
 JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_setDefaultStreamValues(
-        JNIEnv* env, jobject,
-            jint sampleRate,
-            jint framesPerBurst
-        ) {
+        JNIEnv *env, jobject,
+        jint sampleRate,
+        jint framesPerBurst
+) {
     __android_log_print(ANDROID_LOG_INFO, TAG, "Setting %s", __func__);
     oboe::DefaultStreamValues::SampleRate = (int32_t) sampleRate;
     oboe::DefaultStreamValues::FramesPerBurst = (int32_t) framesPerBurst;
 }
 
-JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_setFrequency(
-        JNIEnv* env, jobject,jfloat freq
+JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_addSoundInput(
+        JNIEnv *env, jobject, jint id, jfloat freq
 ) {
-    sPlayer.getAudioProcessingUnit().setFrequency(freq);
+    sPlayer.getAudioProcessingUnit().addSoundInput(id, freq);
+}
+
+JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_changeSoundInputFrequency(
+        JNIEnv *env, jobject, jint id, jfloat freq
+) {
+    sPlayer.getAudioProcessingUnit().changeSoundInputFrequency(id, freq);
+}
+
+JNIEXPORT void JNICALL Java_com_sintegra_splinter_data_service_NativeAudioBridge_removeSoundInput(
+        JNIEnv *env, jobject, jint id
+) {
+    sPlayer.getAudioProcessingUnit().removeSoundInput(id);
 }
 
 #ifdef __cplusplus
