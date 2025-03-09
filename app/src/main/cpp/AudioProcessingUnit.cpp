@@ -62,7 +62,6 @@ oboe::DataCallbackResult AudioProcessingUnit::onAudioReady(
 
     int sampleRate = audioStream->getSampleRate();
     int phaseIncrement = frequency * waveSize / sampleRate;
-    LOG_I(waveSize);
 
     for (int i = 0; i < numFrames; i++) {
         float envelopeCoef = 1.; // envelopeFilter->getEnvelopeForCurrentTime();

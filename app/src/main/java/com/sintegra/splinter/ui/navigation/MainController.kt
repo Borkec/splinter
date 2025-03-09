@@ -9,9 +9,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.sintegra.splinter.ui.mainscreen.EditableWaveGraph
-import com.sintegra.splinter.ui.mainscreen.Octave
-import com.sintegra.splinter.ui.mainscreen.SplinterArea
 import com.sintegra.splinter.ui.mainscreen.MainSplinterScreen
+import com.sintegra.splinter.ui.mainscreen.Piano
+import com.sintegra.splinter.ui.mainscreen.SplinterArea
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -39,7 +39,7 @@ fun MainController() {
                 content = {
                     when (screen.type) {
                         MainScreenType.SPLINTER_AREA -> SplinterArea()
-                        MainScreenType.PIANO_KEYS -> Octave(Modifier.fillMaxSize())
+                        MainScreenType.PIANO_KEYS -> Piano(modifier = Modifier.fillMaxSize())
                     }
                 }
             )
