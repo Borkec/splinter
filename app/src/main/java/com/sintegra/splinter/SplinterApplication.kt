@@ -8,6 +8,7 @@ import com.sintegra.splinter.data.service.AudioSourceImpl
 import com.sintegra.splinter.data.service.NativeAudioBridge
 import com.sintegra.splinter.model.WAVETABLE_SIZE
 import com.sintegra.splinter.ui.viewmodel.*
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -15,7 +16,8 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 
 val splinterModule = module {
-    single<AudioSource> { AudioSourceImpl() }
+    single<NativeAudioBridge> { NativeAudioBridge() }
+    single<AudioSource> { AudioSourceImpl(get()) }
     single<AudioRepository> { AudioRepositoryImpl(get()) }
 
     viewModelOf(::CustomWaveEditorViewModel)
@@ -40,6 +42,6 @@ class SplinterApplication: Application() {
             modules(splinterModule)
         }
 
-        NativeAudioBridge.initializeBridge(WAVETABLE_SIZE)
+        getKoin().get<NativeAudioBridge>().initializeBridge(WAVETABLE_SIZE)
     }
 }

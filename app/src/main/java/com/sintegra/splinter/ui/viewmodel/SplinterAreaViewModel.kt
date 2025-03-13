@@ -6,11 +6,11 @@ import com.sintegra.splinter.model.SoundInput
 
 class SplinterAreaViewModel(private val audioRepository: AudioRepository) : ViewModel() {
 
-    fun onHold(id: Int, x: Float, y: Float) {
+    fun onTrackedPointer(id: Int, x: Float, y: Float) {
         audioRepository.addSoundInput(SoundInput(id, frequency = y*1000))
     }
 
-    fun onRelease(id: Int) {
+    fun onPointerRelease(id: Int) {
         audioRepository.removeSoundInput(id)
     }
 

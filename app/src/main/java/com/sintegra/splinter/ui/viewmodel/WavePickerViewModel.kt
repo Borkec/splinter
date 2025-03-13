@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class WavePickerViewModel(private val audioRepository: AudioRepository) : ViewModel() {
+class WavePickerViewModel(
+    private val audioRepository: AudioRepository
+) : ViewModel() {
 
     val selectedWaveViewState: StateFlow<SelectedWaveViewState> =
         audioRepository.currentWave
@@ -27,9 +29,6 @@ class WavePickerViewModel(private val audioRepository: AudioRepository) : ViewMo
 
 data class SelectedWaveViewState(val waveName: String, val waveType: WaveType, val waveData: List<Offset>) {
     companion object {
-        val initial = fromWaveModel(WaveModel.DEFAULT)
-        val common = WaveType.entries.map { waveType -> fromWaveModel(WaveModel(waveType)) }
-
         fun fromWaveModel(waveModel: WaveModel): SelectedWaveViewState {
             val res = 16
             val data = waveModel.audioData.toList()
@@ -44,5 +43,8 @@ data class SelectedWaveViewState(val waveName: String, val waveType: WaveType, v
                     .map { (x, y) -> Offset(x, y) }
             )
         }
+
+        val initial = fromWaveModel(WaveModel.DEFAULT)
+        val common = WaveType.entries.map { waveType -> fromWaveModel(WaveModel(waveType)) }
     }
 }

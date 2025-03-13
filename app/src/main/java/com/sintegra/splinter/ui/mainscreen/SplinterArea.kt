@@ -41,11 +41,11 @@ fun SplinterArea(
                 surfaceSize?.let {
                     getPointerInput(
                         onHold = { id, x, y ->
-                            viewModel.onHold(id, x / it.width, y / it.height)
+                            viewModel.onTrackedPointer(id, x / it.width, y / it.height)
                             pointers += id to Offset(x, y)
                         },
                         onRelease = { id ->
-                            viewModel.onRelease(id)
+                            viewModel.onPointerRelease(id)
                             pointers -= id
                         }
                     )

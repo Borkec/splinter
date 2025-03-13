@@ -1,6 +1,6 @@
 package com.sintegra.splinter.data.service
 
-object NativeAudioBridge {
+open class NativeAudioBridge {
 
     external fun initializeBridge(size: Int)
     external fun getTableSize(): Int
@@ -21,7 +21,7 @@ object NativeAudioBridge {
     external fun setDefaultStreamValues(sampleRate: Int, framesPerBurst: Int)
     external fun setAudioBuffer(buffer: FloatArray)
 
-    external fun addSoundInput(id: Int, frequency: Float)
-    external fun changeSoundInputFrequency(id: Int, frequency: Float)
-    external fun removeSoundInput(id: Int)
+    open external fun addSoundInput(id: Int, frequency: Float)
+    open external fun changeSoundInputFrequency(id: Int, frequency: Float)
+    open external fun removeSoundInput(id: Int)
 }

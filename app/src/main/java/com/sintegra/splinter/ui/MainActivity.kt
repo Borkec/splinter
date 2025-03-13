@@ -28,14 +28,17 @@ import androidx.compose.ui.Modifier
 import com.sintegra.splinter.data.service.NativeAudioBridge
 import com.sintegra.splinter.ui.navigation.MainController
 import com.sintegra.splinter.ui.theme.SplinterTheme
+import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
+
+    private val nativeAudioBridge: NativeAudioBridge by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
-        NativeAudioBridge.openAudioStream()
-        NativeAudioBridge.startAudioStream()
+        nativeAudioBridge.openAudioStream()
+        nativeAudioBridge.startAudioStream()
         setDefaultStreamValues()
 
 
@@ -53,19 +56,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        NativeAudioBridge.startAudioStream()
+        nativeAudioBridge.startAudioStream()
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
     }
 
     override fun onStop() {
         super.onStop()
-        NativeAudioBridge.stopAudioStream()
+        nativeAudioBridge.stopAudioStream()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        NativeAudioBridge.stopAudioStream()
-        NativeAudioBridge.closeAudioStream()
+        nativeAudioBridge.stopAudioStream()
+        nativeAudioBridge.closeAudioStream()
     }
 
     private fun setDefaultStreamValues() {
@@ -75,6 +78,6 @@ class MainActivity : ComponentActivity() {
         val framesPerBurstStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER)
         val defaultFramesPerBurst = framesPerBurstStr.toInt()
 
-        NativeAudioBridge.setDefaultStreamValues(defaultSampleRate, defaultFramesPerBurst)
+        nativeAudioBridge.setDefaultStreamValues(defaultSampleRate, defaultFramesPerBurst)
     }
 }

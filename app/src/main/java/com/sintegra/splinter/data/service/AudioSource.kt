@@ -1,6 +1,5 @@
 package com.sintegra.splinter.data.service
 
-import com.sintegra.splinter.data.service.NativeAudioBridge.removeAudioListener
 import com.sintegra.splinter.model.SoundInput
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -12,26 +11,16 @@ interface AudioSource {
 
     val cursorPosition: Flow<Int>
 
-    fun startAudioStream()
-
-    fun stopAudioStream()
-
-    fun playNote()
-
-    fun releaseNote()
-
     fun addSoundInput(soundInput: SoundInput)
 
-    fun changeSoundInputFrequency(soundInput: SoundInput, newFrequency: Float)
+    fun changeSoundInputFrequency(soundInputId: Int, newFrequency: Float)
 
     fun removeSoundInput(soundInputId: Int)
 
     fun setAudioBuffer(buffer: FloatArray)
-
-    fun getWaveTableSize(): Int
 }
 
-class AudioSourceImpl: AudioSource {
+class AudioSourceImpl(private val nativeAudioBridge: NativeAudioBridge): AudioSource {
 
     override val audioSignal = callbackFlow {
         val listener = object : AudioFrameListener {
@@ -40,9 +29,9 @@ class AudioSourceImpl: AudioSource {
             }
         }
 
-        NativeAudioBridge.addAudioListener(listener)
+        nativeAudioBridge.addAudioListener(listener)
         awaitClose {
-            removeAudioListener(listener)
+            nativeAudioBridge.removeAudioListener(listener)
         }
     }
 
@@ -53,51 +42,25 @@ class AudioSourceImpl: AudioSource {
             }
         }
 
-        NativeAudioBridge.addAudioCursorListener(listener)
+        nativeAudioBridge.addAudioCursorListener(listener)
         awaitClose()
     }
 
-    override fun playNote() {
-        NativeAudioBridge.playNote()
-    }
-
-    override fun releaseNote() {
-        NativeAudioBridge.releaseNote()
-    }
-
-    override fun startAudioStream() {
-        NativeAudioBridge.startAudioStream()
-    }
-
-    override fun stopAudioStream() {
-        NativeAudioBridge.stopAudioStream()
-    }
-
     override fun addSoundInput(soundInput: SoundInput) {
-        NativeAudioBridge.addSoundInput(soundInput.id, soundInput.frequency)
+        nativeAudioBridge.addSoundInput(soundInput.id, soundInput.frequency)
     }
 
-    override fun changeSoundInputFrequency(soundInput: SoundInput, newFrequency: Float) {
-        NativeAudioBridge.changeSoundInputFrequency(soundInput.id, newFrequency)
+    override fun changeSoundInputFrequency(soundInputId: Int, newFrequency: Float) {
+        nativeAudioBridge.changeSoundInputFrequency(soundInputId, newFrequency)
     }
 
     override fun removeSoundInput(soundInputId: Int) {
-        NativeAudioBridge.removeSoundInput(soundInputId)
+        nativeAudioBridge.removeSoundInput(soundInputId)
     }
 
     override fun setAudioBuffer(buffer: FloatArray) {
-        NativeAudioBridge.setAudioBuffer(buffer)
+        nativeAudioBridge.setAudioBuffer(buffer)
     }
-
-    override fun getWaveTableSize(): Int {
-        return NativeAudioBridge.getTableSize()
-    }
-
-
-}
-
-enum class AudioServerResult(statusCode: Int) {
-    OK(0), UNKNOWN(1)
 }
 
 interface AudioFrameListener {
