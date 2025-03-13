@@ -19,12 +19,12 @@ package com.sintegra.splinter.ui
 import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import com.sintegra.splinter.data.service.NativeAudioBridge
 import com.sintegra.splinter.ui.navigation.MainController
 import com.sintegra.splinter.ui.theme.SplinterTheme
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         nativeAudioBridge.openAudioStream()
         nativeAudioBridge.startAudioStream()
         setDefaultStreamValues()
@@ -57,7 +57,6 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         nativeAudioBridge.startAudioStream()
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
     }
 
     override fun onStop() {
